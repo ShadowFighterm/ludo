@@ -22,5 +22,7 @@ public:
 	void UpdateBoard(sf::RenderWindow& window, Position s, int n);
 	bool IsEmptySpace(Position p)const;
 	Piece* GetPieceAt(Position p)const;
+	Shape* GetShapeAt(Position p)const;
+	const sf::Vector2f& GetDim()const;
 };
 

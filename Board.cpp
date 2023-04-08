@@ -1,8 +1,8 @@
 #include "Board.h"
 #include<iostream>
+#include"Rectangle.h"
 #include<fstream>
 #include"Shape.h"
-#include"Rectangle.h"
 #include"Global.h"
 #include"RedPiece.h"
 #include"BluePiece.h"
@@ -10,7 +10,6 @@
 #include"GreenPiece.h"
 #include"CyanPiece.h"
 #include"OrangePiece.h"
-#include<iostream>
 using namespace std;
 Board::Board(sf::RenderWindow& window, int nop)
 {
@@ -27,7 +26,7 @@ Board::Board(sf::RenderWindow& window, int nop)
 	bg.setScale((float)window.getSize().x / Global::ts[7].getSize().x, (float)window.getSize().y / Global::ts[7].getSize().y);
 	star.setTexture(Global::ts[6]);
 	star.setScale((float)Global::SqrDim.x / Global::ts[6].getSize().x, (float)Global::SqrDim.y / Global::ts[6].getSize().y);
-	sf::Color lightYellow(255, 255, 204); // for path
+	sf::Color lightYellow(255, 255, 204);
 	sf::Color orange(255, 165, 0);
 	Position p;
 	ifstream cin1("BoardLoad.txt");
@@ -228,9 +227,17 @@ void Board::UpdateBoard(sf::RenderWindow& window, Position s,int n)
 }
 bool Board::IsEmptySpace(Position p)const
 {
-	return true;
+	return this->pcs[p.ri][p.ci] == nullptr;
 }
 Piece* Board::GetPieceAt(Position p)const
 {
 	return this->pcs[p.ri][p.ci];
+}
+Shape* Board::GetShapeAt(Position p)const
+{
+	return this->shp[p.ri][p.ci];
+}
+const sf::Vector2f& Board::GetDim()const
+{
+	return this->dim;
 }

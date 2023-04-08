@@ -7,5 +7,7 @@ public:
 	static sf::Vector2f SqrDim;
 	static sf::Texture* ts;
 	static sf::Font f;
+
+	void static getRowColbyLeftClick(int& rpos, int& cpos, sf::RenderWindow&window);
 };
 

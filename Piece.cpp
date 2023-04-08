@@ -22,6 +22,7 @@ void Piece::Move(sf::RenderWindow& window, Position p)
 	this->pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 4);
 	this->pos.y = (float)p.ri * Global::SqrDim.y;
 	this->pc.setPosition(this->pos);
+	this->IsFirstMove = false;
 }
 void Piece::SetPosition(Position p)
 {
