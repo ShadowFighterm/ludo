@@ -3,8 +3,7 @@
 RedPiece::RedPiece(Position p, int dir, char id)
 	:Piece(p, dir, id)
 {
-	this->tpc.loadFromFile("red_piece.png");
-	this->pc.setTexture(tpc);
+	this->pc.setTexture(Global::ts[0]);
 	this->pc.setScale(Scale);
 	this->pc.setPosition(pos);
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include"Position.h"
+#include"Global.h"
 #include<SFML/Graphics.hpp>
 class Piece
 {
@@ -7,7 +8,6 @@ protected:
 	char id;
 	bool IsFirstMove;
 	sf::Sprite pc;
-	sf::Texture tpc;
 	sf::Vector2f Scale;
 	sf::Vector2f pos;
 	Position p;

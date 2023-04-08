@@ -14,27 +14,24 @@
 using namespace std;
 Board::Board(sf::RenderWindow& window, int nop)
 {
-	f.loadFromFile("arial.ttf");
+	this->dim.x = 24;
+	this->dim.y = 15;
+	Global::SqrDim.x = (float)window.getSize().x / (dim.x + 3);
+	Global::SqrDim.y = (float)window.getSize().y / dim.y;
 	ludo.setCharacterSize(30);
 	ludo.setFillColor(sf::Color::Black);
-	ludo.setFont(f);
-	ludo.setPosition((float)window.getSize().x / 2 - 120, window.getSize().y / 2 - 20);
-	ludo.setString("L U D O");
-	tbg.loadFromFile("background.jpg");
-	bg.setTexture(tbg);
-	bg.setScale((float)window.getSize().x / tbg.getSize().x, (float)window.getSize().y / tbg.getSize().y);
-	tstr.loadFromFile("star.png");
-	star.setTexture(tstr);
+	ludo.setFont(Global::f);
+	ludo.setString("* L U D O *");
+	ludo.setPosition((float)(Global::SqrDim.x * dim.x) / 2 - Global::SqrDim.x, (float)window.getSize().y / 2 - (Global::SqrDim.y/4));
+	bg.setTexture(Global::ts[7]);
+	bg.setScale((float)window.getSize().x / Global::ts[7].getSize().x, (float)window.getSize().y / Global::ts[7].getSize().y);
+	star.setTexture(Global::ts[6]);
+	star.setScale((float)Global::SqrDim.x / Global::ts[6].getSize().x, (float)Global::SqrDim.y / Global::ts[6].getSize().y);
 	sf::Color lightYellow(255, 255, 204); // for path
 	sf::Color orange(255, 165, 0);
 	Position p;
 	ifstream cin1("BoardLoad.txt");
 	ofstream cout1("PieceLoad.txt");
-	this->dim.x = 24;
-	this->dim.y = 15;
-	Global::SqrDim.x = (float)window.getSize().x / (dim.x + 3);
-	Global::SqrDim.y = (float)window.getSize().y / dim.y;
-	star.setScale((float)Global::SqrDim.x / tstr.getSize().x, (float)Global::SqrDim.y / tstr.getSize().y);
 	char input;
 	this->pcs = new Piece **[dim.y];// 4 is the nop
 	this->shp = new Shape**[dim.y];

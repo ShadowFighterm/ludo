@@ -2,8 +2,7 @@
 CyanPiece::CyanPiece(Position p, int dir, char id)
 	:Piece(p, dir, id)
 {
-	this->tpc.loadFromFile("cyan_piece.png");
-	this->pc.setTexture(tpc);
+	this->pc.setTexture(Global::ts[4]);
 	this->pc.setScale(Scale);
 	this->pc.setPosition(pos);
 }

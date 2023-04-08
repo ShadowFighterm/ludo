@@ -8,11 +8,8 @@ class Board
 private:
 	sf::Vector2f dim;
 	sf::Sprite bg;
-	sf::Texture tbg;
 	sf::Sprite star;
-	sf::Texture tstr;
 	sf::Text ludo;
-	sf::Font f;
 	Shape*** shp;
 	Piece*** pcs;
 	void DrawBG(sf::RenderWindow& window)const;

@@ -6,7 +6,7 @@
 using namespace std;
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(1200, 800), "Ludo", sf::Style::Close | sf::Style::Titlebar);
+	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "LUDO");
 	Ludo l(window);
 	l.Play(window);
 }

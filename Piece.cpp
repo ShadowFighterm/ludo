@@ -7,8 +7,8 @@ Piece::Piece(Position p, int dir, char id)
 	SetPosition(p);
 	SetDir(dir);
 	SetId(id);
-	this->Scale.x = 0.08;
-	this->Scale.y = 0.08;
+	this->Scale.x = 0.1;
+	this->Scale.y = 0.1;
 	this->pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 4);
 	this->pos.y = (float)p.ri * Global::SqrDim.y + (Global::SqrDim.y / 8);
 }
