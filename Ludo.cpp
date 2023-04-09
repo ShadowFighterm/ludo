@@ -43,18 +43,36 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 				window.close();
 		}
 		if (p2.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
+		{
+			p2.setCharacterSize(40);
 			p2.setFillColor(sf::Color::Green);
+		}
 		else
+		{
+			p2.setCharacterSize(30);
 			p2.setFillColor(sf::Color::White);
+		}
 		if (p4.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
+		{
+			p4.setCharacterSize(40);
 			p4.setFillColor(sf::Color::Green);
+		}
 		else
+		{
+			p4.setCharacterSize(30);
 			p4.setFillColor(sf::Color::White);
+		}
 
 		if (p6.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
+		{
+			p6.setCharacterSize(40);
 			p6.setFillColor(sf::Color::Green);
+		}
 		else
+		{
+			p6.setCharacterSize(30);
 			p6.setFillColor(sf::Color::White);
+		}
 
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
@@ -102,7 +120,7 @@ Ludo::Ludo(sf::RenderWindow& window)
 	MainMenu(window);
 	this->IsDesSel = false;
 	this-> IsSocSel = false;
-	this->turn = 1;
+	this->turn = 0;
 	this->b = new Board(window, nop);
 }
 void Ludo::Play(sf::RenderWindow& window)
@@ -126,6 +144,12 @@ void Ludo::Play(sf::RenderWindow& window)
 		window.display();
 	}
 }
+void Ludo::TurnCh()
+{
+	turn++;
+	if (turn == nop)
+		turn = 0;
+}
 bool Ludo::InBound()const
 {
 	if (s.ri < 0 || s.ri >= b->GetDim().y || s.ci < 0 || s.ci >= b->GetDim().x)
@@ -137,14 +161,15 @@ bool Ludo::IsValidSource()const
 	if (b->IsEmptySpace(s))
 		return false;
 	char id = b->GetPieceAt(s)->GetId();
-	if (turn == 1 && id == 'r' || turn == 2 && id == 'g' || turn == 3 && id == 'b' || turn == 4 && id == 'y' || turn == 5 && id == 'c' || turn == 6 && id == 'o')
+	if (Global::turnId[turn] == id)
 		return true;
 	return false;
 }
 bool Ludo::IsValidDestin()const
 {
 	char id = b->GetShapeAt(d)->GetId();
-	if (turn == 1 && id == '/' || turn == 2 && id == '*' || turn == 3 && id == '+' || turn == 4 && id == '_' || turn == 5 && id == '|' || turn == 6 && id == '&')
+	char tid = Global::turnId[turn];
+	if (tid == 'r' && id == '/' || tid == 'g' && id == '*' ||tid == 'b' && id == '+' || tid == 'y' && id == '_' || tid == 'c' && id == '|' || tid == 'o' && id == '&')
 		return true;
 	return false;
 }
@@ -183,5 +208,6 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 			b->UpdateBoard(window, s, d);
 		else
 			b->UpdateBoard(window, s, 2);
+		TurnCh();
 	}
 }

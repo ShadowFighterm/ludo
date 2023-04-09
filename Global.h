@@ -4,6 +4,7 @@ class Global
 {
 public:
 	static enum dir { UP, DOWN, RIGHT, LEFT };
+	static char* turnId;
 	static sf::Vector2f SqrDim;
 	static sf::Texture* ts;
 	static sf::Font f;

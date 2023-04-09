@@ -1,6 +1,8 @@
 #pragma once
 #include<SFML/Graphics.hpp>
 #include"Position.h"
+#include<vector>
+using namespace std;
 class Shape;
 class Piece;
 class Board
@@ -12,6 +14,7 @@ private:
 	sf::Text ludo;
 	Shape*** shp;
 	Piece*** pcs;
+	vector<vector<vector<Piece>>> pc;
 	void DrawBG(sf::RenderWindow& window)const;
 	void DrawStar(sf::RenderWindow& window, Position p);
 	bool IsValidPath(Position p)const;

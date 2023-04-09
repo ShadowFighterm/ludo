@@ -17,6 +17,7 @@ Board::Board(sf::RenderWindow& window, int nop)
 	this->dim.y = 15;
 	Global::SqrDim.x = (float)window.getSize().x / (dim.x + 3);
 	Global::SqrDim.y = (float)window.getSize().y / dim.y;
+	Global::turnId = new char[nop];
 	ludo.setCharacterSize(30);
 	ludo.setFillColor(sf::Color::Black);
 	ludo.setFont(Global::f);
@@ -109,6 +110,27 @@ Board::Board(sf::RenderWindow& window, int nop)
 		}
 	}
 	char id;
+	switch (nop)
+	{
+	case 2:
+		Global::turnId[0] = 'r';
+		Global::turnId[1] = 'o';
+		break;
+	case 4:
+		Global::turnId[0] = 'r';
+		Global::turnId[1] = 'b';
+		Global::turnId[2] = 'o';
+		Global::turnId[3] = 'y';
+		break;
+	case 6:
+		Global::turnId[0] = 'r';
+		Global::turnId[1] = 'c';
+		Global::turnId[2] = 'b';
+		Global::turnId[3] = 'o';
+		Global::turnId[4] = 'g';
+		Global::turnId[5] = 'y';
+		break;
+	}
 	for (int i = 0;i < dim.y;i++)
 	{
 		this->pcs[i] = new Piece * [dim.x];
@@ -117,21 +139,18 @@ Board::Board(sf::RenderWindow& window, int nop)
 			id = this->shp[i][j]->GetId();
 			switch (nop)
 			{
-			case 1:
 			case 2:
 				if(id=='r' || id=='o')
 					cout1 << id << " ";
 				else
 					cout1 << '-' << " ";
 				break;
-			case 3:
 			case 4:
 				if(id=='r' || id=='o' || id=='b' || id=='y')
 					cout1 << id << " ";
 				else
 					cout1 << '-' << " ";
 				break;
-			case 5:
 			case 6:
 				if (id == 'r' || id == 'g' || id == 'b' || id == 'y' || id == 'c' || id == 'o')
 					cout1 << id << " ";
@@ -228,7 +247,6 @@ bool Board::IsValidPath(Position p)const
 }
 void Board::UpdateBoard(sf::RenderWindow& window, Position s, int n)
 {
-	char sid;
 	int count = 0;
 	Position d;
 	d.ri = s.ri, d.ci = s.ci;

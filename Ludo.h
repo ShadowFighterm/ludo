@@ -19,6 +19,7 @@ private:
 	bool IsValidDestin()const;
 	void MainMenu(sf::RenderWindow& window);
 	void SelectPosition(sf::RenderWindow& window);
+	void TurnCh();
 public:
 	Ludo(sf::RenderWindow& window);
 	void Play(sf::RenderWindow& window);
