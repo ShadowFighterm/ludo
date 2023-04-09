@@ -182,6 +182,6 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 		if (b->GetPieceAt(s)->GetIsFirst())
 			b->UpdateBoard(window, s, d);
 		else
-			b->UpdateBoard(window, s, 2);
+			b->UpdateBoard(window, s, 20);
 	}
 }
