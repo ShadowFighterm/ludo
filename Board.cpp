@@ -221,9 +221,116 @@ void Board::UpdateBoard(sf::RenderWindow& window, Position s, Position d)
 	this->pcs[d.ri][d.ci] = this->pcs[s.ri][s.ci];
 	this->pcs[s.ri][s.ci] = nullptr;
 }
-void Board::UpdateBoard(sf::RenderWindow& window, Position s,int n)
+bool Board::IsValidPath(Position p)const
 {
-
+	char sid = shp[p.ri][p.ci]->GetId();
+	return sid == '.' || sid == '?' || sid == '/' || sid == '*' || sid == '+' || sid == '_' || sid == '|' || sid == '&' || sid == 'R' || sid == 'G' || sid == 'B' || sid == 'Y' || sid == 'C' || sid == 'O';
+}
+void Board::UpdateBoard(sf::RenderWindow& window, Position s, int n)
+{
+	char sid;
+	int count = 0;
+	Position d;
+	d.ri = s.ri, d.ci = s.ci;
+	while (window.isOpen())
+	{
+		sf::Event evnt;
+		while (window.pollEvent(evnt))
+		{
+			if (evnt.type == evnt.Closed)
+				window.close();
+		}
+		switch (pcs[s.ri][s.ci]->GetDir())
+		{
+		case Global::UP:
+			d.ri--;
+			if (d.ri != -1 && IsValidPath(d))
+			{
+				pcs[s.ri][s.ci]->Move(window, d);
+				count++;
+				if (pcs[s.ri][s.ci]->IsRoundCompleted(d))
+					pcs[s.ri][s.ci]->SetDir(Global::RIGHT);
+			}
+			else
+			{
+				if (d.ri == -1 || shp[d.ri][d.ci]->GetId() != '#')
+					d.ri++;
+				if (d.ci - 1 != -1 && IsValidPath({ d.ri,d.ci - 1 }))
+					pcs[s.ri][s.ci]->SetDir(Global::LEFT);
+				else if (IsValidPath({d.ri,d.ci+1}))
+					pcs[s.ri][s.ci]->SetDir(Global::RIGHT);
+			}
+			break;
+		case Global::DOWN:
+			d.ri++;
+			if (d.ri != dim.y && IsValidPath(d))
+			{
+				pcs[s.ri][s.ci]->Move(window, d);
+				count++;
+				if (pcs[s.ri][s.ci]->IsRoundCompleted(d))
+					pcs[s.ri][s.ci]->SetDir(Global::LEFT);
+			}
+			else
+			{
+				if (d.ri == dim.y || shp[d.ri][d.ci]->GetId() != '#')
+					d.ri--;
+				if (d.ci + 1 != dim.x && IsValidPath({d.ri,d.ci+1}))
+					pcs[s.ri][s.ci]->SetDir(Global::RIGHT);
+				else if (IsValidPath({d.ri,d.ci-1}))
+					pcs[s.ri][s.ci]->SetDir(Global::LEFT);
+			}
+			break;
+		case Global::LEFT:
+			d.ci--;
+			if (d.ci != -1 && IsValidPath(d))
+			{
+				pcs[s.ri][s.ci]->Move(window, d);
+				count++;
+				if (pcs[s.ri][s.ci]->IsRoundCompleted(d))
+					pcs[s.ri][s.ci]->SetDir(Global::UP);
+			}
+			else
+			{
+				if (d.ci == -1 || shp[d.ri][d.ci]->GetId() != '#')
+					d.ci++;
+				if (IsValidPath({d.ri-1,d.ci}))
+					pcs[s.ri][s.ci]->SetDir(Global::UP);
+				else if (d.ri + 1 != dim.y && IsValidPath({d.ri+1,d.ci}))
+					pcs[s.ri][s.ci]->SetDir(Global::DOWN);
+			}
+			break;
+		case Global::RIGHT:
+			d.ci++;
+			if (d.ci != dim.x && IsValidPath(d))
+			{
+				pcs[s.ri][s.ci]->Move(window, d);
+				count++;
+				if (pcs[s.ri][s.ci]->IsRoundCompleted(d))
+					pcs[s.ri][s.ci]->SetDir(Global::DOWN);
+			}
+			else
+			{
+				if (d.ci == dim.x || shp[d.ri][d.ci]->GetId() != '#')
+					d.ci--;
+				if (d.ri - 1 != -1 && IsValidPath({ d.ri - 1,d.ci }))
+					pcs[s.ri][s.ci]->SetDir(Global::UP);
+				else if (IsValidPath({ d.ri + 1,d.ci }))
+					pcs[s.ri][s.ci]->SetDir(Global::DOWN);
+			}
+			break;
+		}
+		if (count == n)
+		{
+			this->pcs[d.ri][d.ci] = this->pcs[s.ri][s.ci];
+			this->pcs[s.ri][s.ci] = nullptr;
+			break;
+		}
+		window.clear();
+		DrawBoard(window);
+		DrawPieces(window);
+		window.display();
+		sf::sleep(sf::seconds(0.1));
+	}
 }
 bool Board::IsEmptySpace(Position p)const
 {

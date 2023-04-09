@@ -14,6 +14,7 @@ private:
 	Piece*** pcs;
 	void DrawBG(sf::RenderWindow& window)const;
 	void DrawStar(sf::RenderWindow& window, Position p);
+	bool IsValidPath(Position p)const;
 public:
 	Board(sf::RenderWindow& window, int nop);
 	void DrawBoard(sf::RenderWindow& window);

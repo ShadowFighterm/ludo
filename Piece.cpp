@@ -20,9 +20,13 @@ void Piece::Move(sf::RenderWindow& window, Position p)
 {
 	this->p = p;
 	this->pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 4);
-	this->pos.y = (float)p.ri * Global::SqrDim.y;
+	this->pos.y = (float)p.ri * Global::SqrDim.y + (Global::SqrDim.y / 8);
 	this->pc.setPosition(this->pos);
 	this->IsFirstMove = false;
+}
+bool Piece::IsRoundCompleted(Position p)const
+{
+	return Round.ri == p.ri && Round.ci == p.ci;
 }
 void Piece::SetPosition(Position p)
 {
@@ -55,4 +59,8 @@ Position Piece::GetPosition()const
 int Piece::GetDir()const
 {
 	return this->dir;
+}
+Position Piece::GetRound()const
+{
+	return this->Round;
 }

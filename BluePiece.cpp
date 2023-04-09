@@ -5,4 +5,5 @@ BluePiece::BluePiece(Position p, int dir, char id)
 	this->pc.setTexture(Global::ts[2]);
 	this->pc.setScale(Scale);
 	this->pc.setPosition(pos);
+	this->Round = { 0, 16 };
 }

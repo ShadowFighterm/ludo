@@ -10,10 +10,12 @@ protected:
 	sf::Sprite pc;
 	sf::Vector2f Scale;
 	sf::Vector2f pos;
+	Position Round;
 	Position p;
 	int dir;
 public:
 	Piece(Position pos, int dir, char id);
+	bool IsRoundCompleted(Position p)const;
 	void DrawPiece(sf::RenderWindow& window)const;
 	void Move(sf::RenderWindow& window, Position p);
 	void SetId(char id);
@@ -24,5 +26,6 @@ public:
 	char GetId()const;
 	Position GetPosition()const;
 	int GetDir()const;
+	Position GetRound()const;
 };
 
