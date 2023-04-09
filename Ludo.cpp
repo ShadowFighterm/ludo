@@ -15,7 +15,7 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 	sf::Sprite twop;
 	logo.setTexture(Global::ts[8]);
 	logo.setScale(1, 1);
-	logo.setPosition((float)window.getSize().x / 3 + (window.getSize().x / 32),(float) window.getSize().y / 8);
+	logo.setPosition((float)window.getSize().x / 3 + (window.getSize().x / 32), (float)window.getSize().y / 8);
 	menubg.setTexture(Global::ts[9]);
 	menubg.setScale((float)window.getSize().x / Global::ts[9].getSize().x, (float)window.getSize().y / Global::ts[9].getSize().y);
 	twop.setTexture(Global::ts[10]);
