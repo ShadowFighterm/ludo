@@ -6,4 +6,5 @@ OrangePiece::OrangePiece(Position p, int dir, char id)
 	this->pc.setScale(Scale);
 	this->pc.setPosition(pos);
 	this->Round = { 7,23 };
+	this->win = { 7 , 17 };
 }

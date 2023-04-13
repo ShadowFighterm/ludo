@@ -2,13 +2,14 @@
 #include<string>
 #include"Dice.h"
 using namespace std;
+class Dice;
 class Player
 {
 private:
 	string name;
 	int tunrNo;
 	int clr;
-	Dice d;
+	Dice*d;
 public:
 	Player(string name, int turn, int clr);
 	int RollDice()const;
@@ -18,5 +19,6 @@ public:
 	string GetName()const;
 	int GetClr()const;
 	int GetTurnNo()const;
+	Dice GetDice()const;
 };
 

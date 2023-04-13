@@ -13,19 +13,20 @@ private:
 	sf::Sprite star;
 	sf::Text ludo;
 	Shape*** shp;
-	Piece*** pcs;
-	vector<vector<vector<Piece>>> pc;
+	vector<vector<vector<Piece>>> pcs;
 	void DrawBG(sf::RenderWindow& window)const;
 	void DrawStar(sf::RenderWindow& window, Position p);
 	bool IsValidPath(Position p)const;
+	void SetPieces();
 public:
 	Board(sf::RenderWindow& window, int nop);
-	void DrawBoard(sf::RenderWindow& window);
+	void DrawBoard(sf::RenderWindow& window)const;
 	void DrawPieces(sf::RenderWindow& window)const;
-	void UpdateBoard(sf::RenderWindow& window, Position s, Position d);
-	void UpdateBoard(sf::RenderWindow& window, Position s, int n);
+	void UpdateBoard(sf::RenderWindow& window, sf::Vector3f s, Position d);
+	void UpdateBoard(sf::RenderWindow& window, sf::Vector3f s, int n);
 	bool IsEmptySpace(Position p)const;
-	Piece* GetPieceAt(Position p)const;
+	vector<Piece> GetPiecesAt(Position p);
+	Piece GetPieceAt(sf::Vector3f p)const;
 	Shape* GetShapeAt(Position p)const;
 	const sf::Vector2f& GetDim()const;
 };

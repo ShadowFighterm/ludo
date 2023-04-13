@@ -4,14 +4,14 @@
 using namespace std;
 Player::Player(string name, int turn, int clr)
 {
+	this->d = new Dice(turn);
 	SetName(name);
 	SetTurnNo(turn);
 	SetClr(clr);
 }
 int Player::RollDice()const
 {
-	this->d.DisplayRoll();
-	return this->d.Roll();
+	return this->d->Roll();
 }
 void Player::SetName(string name)
 {
@@ -36,4 +36,8 @@ int Player::GetClr()const
 int Player::GetTurnNo()const
 {
 	return this->tunrNo;
+}
+Dice Player::GetDice()const
+{
+	return *d;
 }

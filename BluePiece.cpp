@@ -6,4 +6,5 @@ BluePiece::BluePiece(Position p, int dir, char id)
 	this->pc.setScale(Scale);
 	this->pc.setPosition(pos);
 	this->Round = { 0, 16 };
+	this->win = { 6,16 };
 }

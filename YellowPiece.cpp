@@ -6,4 +6,5 @@ YellowPiece::YellowPiece(Position p, int dir, char id)
 	this->pc.setScale(Scale);
 	this->pc.setPosition(pos);
 	this->Round = { 14,7 };
+	this->win = { 8,7 };
 }

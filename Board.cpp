@@ -15,9 +15,6 @@ Board::Board(sf::RenderWindow& window, int nop)
 {
 	this->dim.x = 24;
 	this->dim.y = 15;
-	Global::SqrDim.x = (float)window.getSize().x / (dim.x + 3);
-	Global::SqrDim.y = (float)window.getSize().y / dim.y;
-	Global::turnId = new char[nop];
 	ludo.setCharacterSize(30);
 	ludo.setFillColor(sf::Color::Black);
 	ludo.setFont(Global::f);
@@ -29,11 +26,13 @@ Board::Board(sf::RenderWindow& window, int nop)
 	star.setScale((float)Global::SqrDim.x / Global::ts[6].getSize().x, (float)Global::SqrDim.y / Global::ts[6].getSize().y);
 	sf::Color lightYellow(255, 255, 204);
 	sf::Color orange(255, 165, 0);
+	sf::Color goldenRod(218, 165, 32);
+	sf::Color khaki(240, 230, 140);
 	Position p;
 	ifstream cin1("BoardLoad.txt");
 	ofstream cout1("PieceLoad.txt");
 	char input;
-	this->pcs = new Piece **[dim.y];// 4 is the nop
+	this->pcs.resize(dim.y);
 	this->shp = new Shape**[dim.y];
 	for (int i = 0;i < dim.y;i++)
 	{
@@ -50,7 +49,7 @@ Board::Board(sf::RenderWindow& window, int nop)
 				this->shp[i][j] = new Rectangle(sf::Color::White, sf::Color::White, p, input);
 				break;
 			case'?':
-				this->shp[i][j] = new Rectangle(lightYellow, sf::Color::Black, p, input);
+				this->shp[i][j] = new Rectangle(khaki, sf::Color::Black, p, input);
 				break;
 			case'.':
 				this->shp[i][j] = new Rectangle(lightYellow, sf::Color::Black, p, input);
@@ -61,31 +60,37 @@ Board::Board(sf::RenderWindow& window, int nop)
 			case'B':
 			case'b':
 			case'+':
+			case'`':
 				this->shp[i][j] = new Rectangle(sf::Color::Blue, sf::Color::Black, p, input);
 				break;
 			case'R':
 			case'r':
 			case'/':
+			case')':
 				this->shp[i][j] = new Rectangle(sf::Color::Red, sf::Color::Black, p, input);
 				break;
 			case'Y':
 			case'y':
 			case'_':
+			case'~':
 				this->shp[i][j] = new Rectangle(sf::Color::Yellow, sf::Color::Black, p, input);
 				break;
 			case'G':
 			case'g':
 			case'*':
+			case'>':
 				this->shp[i][j] = new Rectangle(sf::Color::Green, sf::Color::Black, p, input);
 				break;
 			case'C':
 			case'c':
 			case'|':
+			case'!':
 				this->shp[i][j] = new Rectangle(sf::Color::Cyan, sf::Color::Black, p, input);
 				break;
 			case'O':
 			case'o':
 			case'&':
+			case'<':
 				this->shp[i][j] = new Rectangle(orange, sf::Color::Black, p, input);
 				break;
 			case'1':
@@ -106,34 +111,15 @@ Board::Board(sf::RenderWindow& window, int nop)
 			case '6':
 				this->shp[i][j] = new Rectangle(orange, orange, p, input);
 				break;
+			default:
+				cout << input << "not found";
 			}
 		}
 	}
 	char id;
-	switch (nop)
-	{
-	case 2:
-		Global::turnId[0] = 'r';
-		Global::turnId[1] = 'o';
-		break;
-	case 4:
-		Global::turnId[0] = 'r';
-		Global::turnId[1] = 'b';
-		Global::turnId[2] = 'o';
-		Global::turnId[3] = 'y';
-		break;
-	case 6:
-		Global::turnId[0] = 'r';
-		Global::turnId[1] = 'c';
-		Global::turnId[2] = 'b';
-		Global::turnId[3] = 'o';
-		Global::turnId[4] = 'g';
-		Global::turnId[5] = 'y';
-		break;
-	}
+	
 	for (int i = 0;i < dim.y;i++)
 	{
-		this->pcs[i] = new Piece * [dim.x];
 		for (int j = 0;j < dim.x;j++)
 		{
 			id = this->shp[i][j]->GetId();
@@ -164,6 +150,7 @@ Board::Board(sf::RenderWindow& window, int nop)
 	ifstream rdr("PieceLoad.txt");
 	for (int i = 0;i < dim.y;i++)
 	{
+		this->pcs[i].resize(dim.x);
 		for (int j = 0;j < dim.x;j++)
 		{
 			rdr >> input;
@@ -171,26 +158,24 @@ Board::Board(sf::RenderWindow& window, int nop)
 			switch (input)
 			{
 			case'r':
-				this->pcs[i][j] = new RedPiece(p, Global::RIGHT, input);
+				this->pcs[i][j].push_back(RedPiece(p, Global::RIGHT, input));
 				break;
 			case'b':
-				this->pcs[i][j] = new BluePiece(p, Global::DOWN, input);
+				this->pcs[i][j].push_back(BluePiece(p, Global::DOWN, input));
 				break;
 			case'g':
-				this->pcs[i][j] = new GreenPiece(p, Global::UP, input);
+				this->pcs[i][j].push_back(GreenPiece(p, Global::UP, input));
 				break;
 			case'y':
-				this->pcs[i][j] = new YellowPiece(p, Global::UP, input);
+				this->pcs[i][j].push_back(YellowPiece(p, Global::UP, input));
 				break;
 			case'c':
-				this->pcs[i][j] = new CyanPiece(p, Global::DOWN, input);
+				this->pcs[i][j].push_back(CyanPiece(p, Global::DOWN, input));
 				break;
 			case'o':
-				this->pcs[i][j] = new OrangePiece(p, Global::LEFT, input);
+				this->pcs[i][j].push_back(OrangePiece(p, Global::LEFT, input));
 				break;
-			default:
-				this->pcs[i][j] = nullptr;
-				break;
+			
 			}
 		}
 	}
@@ -205,7 +190,7 @@ void Board::DrawStar(sf::RenderWindow& window, Position p)
 	star.setPosition(p.ci * Global::SqrDim.x, p.ri * Global::SqrDim.y);
 	window.draw(star);
 }
-void Board::DrawBoard(sf::RenderWindow& window)
+void Board::DrawBoard(sf::RenderWindow& window)const
 {
 	DrawBG(window);
 	Position p;
@@ -217,8 +202,6 @@ void Board::DrawBoard(sf::RenderWindow& window)
 			p.ri = i, p.ci = j;
 			c = this->shp[i][j]->GetId();
 			this->shp[i][j]->DrawShape(window);
-			if (c == '?')
-				DrawStar(window, p);
 		}
 	}
 	window.draw(ludo);
@@ -229,27 +212,33 @@ void Board::DrawPieces(sf::RenderWindow& window)const
 	{
 		for (int j = 0;j < dim.x;j++)
 		{
-			if (this->pcs[i][j] != nullptr)
-				this->pcs[i][j]->DrawPiece(window);
+			if (this->pcs[i][j].size() != 0)
+			{
+				for (int k = 0;k < this->pcs[i][j].size();k++)
+				{
+					this->pcs[i][j][k].DrawPiece(window);
+				}
+			}
 		}
 	}
 }
-void Board::UpdateBoard(sf::RenderWindow& window, Position s, Position d)
+void Board::UpdateBoard(sf::RenderWindow& window, sf::Vector3f s, Position d)
 {
-	this->pcs[s.ri][s.ci]->Move(window, d);
-	this->pcs[d.ri][d.ci] = this->pcs[s.ri][s.ci];
-	this->pcs[s.ri][s.ci] = nullptr;
+	this->pcs[s.y][s.x][s.z].Move(window, d);
+	this->pcs[d.ri][d.ci].push_back(this->pcs[s.y][s.x][s.z]);
+	this->pcs[s.y][s.x].erase(this->pcs[s.y][s.x].begin() + s.z);
+	SetPieces();
 }
 bool Board::IsValidPath(Position p)const
 {
 	char sid = shp[p.ri][p.ci]->GetId();
 	return sid == '.' || sid == '?' || sid == '/' || sid == '*' || sid == '+' || sid == '_' || sid == '|' || sid == '&' || sid == 'R' || sid == 'G' || sid == 'B' || sid == 'Y' || sid == 'C' || sid == 'O';
 }
-void Board::UpdateBoard(sf::RenderWindow& window, Position s, int n)
+void Board::UpdateBoard(sf::RenderWindow& window, sf::Vector3f s, int n)
 {
 	int count = 0;
 	Position d;
-	d.ri = s.ri, d.ci = s.ci;
+	d.ri = s.y, d.ci = s.x;
 	while (window.isOpen())
 	{
 		sf::Event evnt;
@@ -258,89 +247,90 @@ void Board::UpdateBoard(sf::RenderWindow& window, Position s, int n)
 			if (evnt.type == evnt.Closed)
 				window.close();
 		}
-		switch (pcs[s.ri][s.ci]->GetDir())
+		switch (pcs[s.y][s.x][s.z].GetDir())
 		{
 		case Global::UP:
 			d.ri--;
 			if (d.ri != -1 && IsValidPath(d))
 			{
-				pcs[s.ri][s.ci]->Move(window, d);
+				pcs[s.y][s.x][s.z].Move(window, d);
 				count++;
-				if (pcs[s.ri][s.ci]->IsRoundCompleted(d))
-					pcs[s.ri][s.ci]->SetDir(Global::RIGHT);
+				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					pcs[s.y][s.x][s.z].SetDir(Global::RIGHT);
 			}
 			else
 			{
 				if (d.ri == -1 || shp[d.ri][d.ci]->GetId() != '#')
 					d.ri++;
 				if (d.ci - 1 != -1 && IsValidPath({ d.ri,d.ci - 1 }))
-					pcs[s.ri][s.ci]->SetDir(Global::LEFT);
+					pcs[s.y][s.x][s.z].SetDir(Global::LEFT);
 				else if (IsValidPath({d.ri,d.ci+1}))
-					pcs[s.ri][s.ci]->SetDir(Global::RIGHT);
+					pcs[s.y][s.x][s.z].SetDir(Global::RIGHT);
 			}
 			break;
 		case Global::DOWN:
 			d.ri++;
 			if (d.ri != dim.y && IsValidPath(d))
 			{
-				pcs[s.ri][s.ci]->Move(window, d);
+				pcs[s.y][s.x][s.z].Move(window, d);
 				count++;
-				if (pcs[s.ri][s.ci]->IsRoundCompleted(d))
-					pcs[s.ri][s.ci]->SetDir(Global::LEFT);
+				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					pcs[s.y][s.x][s.z].SetDir(Global::LEFT);
 			}
 			else
 			{
 				if (d.ri == dim.y || shp[d.ri][d.ci]->GetId() != '#')
 					d.ri--;
 				if (d.ci + 1 != dim.x && IsValidPath({d.ri,d.ci+1}))
-					pcs[s.ri][s.ci]->SetDir(Global::RIGHT);
+					pcs[s.y][s.x][s.z].SetDir(Global::RIGHT);
 				else if (IsValidPath({d.ri,d.ci-1}))
-					pcs[s.ri][s.ci]->SetDir(Global::LEFT);
+					pcs[s.y][s.x][s.z].SetDir(Global::LEFT);
 			}
 			break;
 		case Global::LEFT:
 			d.ci--;
 			if (d.ci != -1 && IsValidPath(d))
 			{
-				pcs[s.ri][s.ci]->Move(window, d);
+				pcs[s.y][s.x][s.z].Move(window, d);
 				count++;
-				if (pcs[s.ri][s.ci]->IsRoundCompleted(d))
-					pcs[s.ri][s.ci]->SetDir(Global::UP);
+				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					pcs[s.y][s.x][s.z].SetDir(Global::UP);
 			}
 			else
 			{
 				if (d.ci == -1 || shp[d.ri][d.ci]->GetId() != '#')
 					d.ci++;
 				if (IsValidPath({d.ri-1,d.ci}))
-					pcs[s.ri][s.ci]->SetDir(Global::UP);
+					pcs[s.y][s.x][s.z].SetDir(Global::UP);
 				else if (d.ri + 1 != dim.y && IsValidPath({d.ri+1,d.ci}))
-					pcs[s.ri][s.ci]->SetDir(Global::DOWN);
+					pcs[s.y][s.x][s.z].SetDir(Global::DOWN);
 			}
 			break;
 		case Global::RIGHT:
 			d.ci++;
 			if (d.ci != dim.x && IsValidPath(d))
 			{
-				pcs[s.ri][s.ci]->Move(window, d);
+				pcs[s.y][s.x][s.z].Move(window, d);
 				count++;
-				if (pcs[s.ri][s.ci]->IsRoundCompleted(d))
-					pcs[s.ri][s.ci]->SetDir(Global::DOWN);
+				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					pcs[s.y][s.x][s.z].SetDir(Global::DOWN);
 			}
 			else
 			{
 				if (d.ci == dim.x || shp[d.ri][d.ci]->GetId() != '#')
 					d.ci--;
 				if (d.ri - 1 != -1 && IsValidPath({ d.ri - 1,d.ci }))
-					pcs[s.ri][s.ci]->SetDir(Global::UP);
+					pcs[s.y][s.x][s.z].SetDir(Global::UP);
 				else if (IsValidPath({ d.ri + 1,d.ci }))
-					pcs[s.ri][s.ci]->SetDir(Global::DOWN);
+					pcs[s.y][s.x][s.z].SetDir(Global::DOWN);
 			}
 			break;
 		}
 		if (count == n)
 		{
-			this->pcs[d.ri][d.ci] = this->pcs[s.ri][s.ci];
-			this->pcs[s.ri][s.ci] = nullptr;
+			this->pcs[d.ri][d.ci].push_back(this->pcs[s.y][s.x][s.z]);
+			this->pcs[s.y][s.x].erase(this->pcs[s.y][s.x].begin() + s.z);
+			SetPieces();
 			break;
 		}
 		window.clear();
@@ -352,9 +342,26 @@ void Board::UpdateBoard(sf::RenderWindow& window, Position s, int n)
 }
 bool Board::IsEmptySpace(Position p)const
 {
-	return this->pcs[p.ri][p.ci] == nullptr;
+	return this->pcs[p.ri][p.ci].size() == 0;
 }
-Piece* Board::GetPieceAt(Position p)const
+void Board::SetPieces()
+{
+	for (int i = 0;i < dim.y;i++)
+	{
+		for (int j = 0;j < dim.x;j++)
+		{
+			for (int k = 0;k < pcs[i][j].size();k++)
+			{
+				pcs[i][j][k].SetPiece(k);
+			}
+		}
+	}
+}
+Piece Board::GetPieceAt(sf::Vector3f p)const
+{
+	return this->pcs[p.y][p.x][p.z];
+}
+vector<Piece> Board::GetPiecesAt(Position p)
 {
 	return this->pcs[p.ri][p.ci];
 }

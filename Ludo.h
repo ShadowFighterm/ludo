@@ -1,6 +1,8 @@
 #pragma once
 #include<SFML/Graphics.hpp>
+#include<vector>
 #include"Position.h"
+using namespace std;
 class Board;
 class Player;
 class Ludo
@@ -8,13 +10,19 @@ class Ludo
 private:
 	bool IsSocSel;
 	bool IsDesSel;
+	bool HasRolled;
+	bool ShowNumber;
+	bool IsNumSel;
+	vector<int>score;
+	sf::Vector3f rs;
 	Position s;
 	Position d;
 	int nop;
 	Board* b;
-	Player* ps;
+	Player** ps;
 	int turn;
 	bool InBound()const;
+	bool IsValidNum()const;
 	bool IsValidSource()const;
 	bool IsValidDestin()const;
 	void MainMenu(sf::RenderWindow& window);

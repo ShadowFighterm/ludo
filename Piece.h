@@ -12,6 +12,8 @@ protected:
 	sf::Vector2f pos;
 	Position Round;
 	Position p;
+	Position win;
+	Position home;
 	int dir;
 public:
 	Piece(Position pos, int dir, char id);
@@ -22,6 +24,7 @@ public:
 	void SetPosition(Position p);
 	void SetDir(int dir);
 	void SetIsFirst(bool b);
+	void SetPiece(int n);
 	bool GetIsFirst()const;
 	char GetId()const;
 	Position GetPosition()const;

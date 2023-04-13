@@ -7,6 +7,7 @@ Piece::Piece(Position p, int dir, char id)
 	SetPosition(p);
 	SetDir(dir);
 	SetId(id);
+	this->home = p;
 	this->Scale.x = 0.1;
 	this->Scale.y = 0.1;
 	this->pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 4);
@@ -27,6 +28,12 @@ void Piece::Move(sf::RenderWindow& window, Position p)
 bool Piece::IsRoundCompleted(Position p)const
 {
 	return Round.ri == p.ri && Round.ci == p.ci;
+}
+void Piece::SetPiece(int n)
+{
+	pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 4);
+	pos.x += n * 5;
+	this->pc.setPosition(pos);
 }
 void Piece::SetPosition(Position p)
 {

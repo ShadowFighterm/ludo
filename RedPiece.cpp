@@ -7,4 +7,5 @@ RedPiece::RedPiece(Position p, int dir, char id)
 	this->pc.setScale(Scale);
 	this->pc.setPosition(pos);
 	this->Round = { 7,0 };
+	this->win = { 7,6 };
 }

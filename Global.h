@@ -7,6 +7,7 @@ public:
 	static char* turnId;
 	static sf::Vector2f SqrDim;
 	static sf::Texture* ts;
+	static sf::Texture* dts;
 	static sf::Font f;
 
 	void static getRowColbyLeftClick(int& rpos, int& cpos, sf::RenderWindow&window);

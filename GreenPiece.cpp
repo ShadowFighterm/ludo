@@ -6,4 +6,5 @@ GreenPiece::GreenPiece(Position p, int dir, char id)
 	this->pc.setScale(Scale);
 	this->pc.setPosition(pos);
 	this->Round = { 14,17 };
+	this->win = { 8 ,17 };
 }
