@@ -27,6 +27,8 @@ private:
 	bool IsValidDestin()const;
 	void MainMenu(sf::RenderWindow& window);
 	void SelectPosition(sf::RenderWindow& window);
+	bool IsPieceAtHome(sf::Vector3f& v)const;
+	bool CanMove()const;
 	void TurnCh();
 public:
 	Ludo(sf::RenderWindow& window);

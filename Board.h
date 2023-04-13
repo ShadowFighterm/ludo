@@ -20,6 +20,7 @@ private:
 	void SetPieces();
 public:
 	Board(sf::RenderWindow& window, int nop);
+	int GetPieceCount(char id)const;
 	void DrawBoard(sf::RenderWindow& window)const;
 	void DrawPieces(sf::RenderWindow& window)const;
 	void UpdateBoard(sf::RenderWindow& window, sf::Vector3f s, Position d);

@@ -2,6 +2,7 @@
 #include<iostream>
 #include"Global.h"
 using namespace std;
+
 Dice::Dice(int turn)
 {
 	d1.setTexture(Global::dts[turn * 6]);
@@ -10,7 +11,7 @@ Dice::Dice(int turn)
 	d4.setTexture(Global::dts[turn * 6 + 3]);
 	d5.setTexture(Global::dts[turn * 6 + 4]);
 	d6.setTexture(Global::dts[turn * 6 + 5]);
-	d.setTexture(*d1.getTexture());
+	d.setTexture(*d4.getTexture());
 	d.setPosition(25 * Global::SqrDim.x, 2 * Global::SqrDim.y);
 	d.setScale((float)Global::SqrDim.x / d.getTexture()->getSize().x, (float)Global::SqrDim.y / d.getTexture()->getSize().y);
 	d1.setScale((float)Global::SqrDim.x / d1.getTexture()->getSize().x, (float)Global::SqrDim.y / d1.getTexture()->getSize().y);

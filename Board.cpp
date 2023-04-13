@@ -206,6 +206,22 @@ void Board::DrawBoard(sf::RenderWindow& window)const
 	}
 	window.draw(ludo);
 }
+int Board::GetPieceCount(char id)const
+{
+	int count = 0;
+	for(int i=0;i<dim.y;i++ )
+	{
+		for (int j = 0;j < dim.x;j++)
+		{
+			for (int k = 0;k < pcs[i][j].size();k++)
+			{
+				if (pcs[i][j][k].GetId() == id)
+					count++;
+			}
+		}
+	}
+	return count;
+}
 void Board::DrawPieces(sf::RenderWindow& window)const
 {
 	for (int i = 0;i < dim.y;i++)
@@ -232,7 +248,7 @@ void Board::UpdateBoard(sf::RenderWindow& window, sf::Vector3f s, Position d)
 bool Board::IsValidPath(Position p)const
 {
 	char sid = shp[p.ri][p.ci]->GetId();
-	return sid == '.' || sid == '?' || sid == '/' || sid == '*' || sid == '+' || sid == '_' || sid == '|' || sid == '&' || sid == 'R' || sid == 'G' || sid == 'B' || sid == 'Y' || sid == 'C' || sid == 'O';
+	return sid == '.' || sid == '?' || sid == '/' || sid == '*' || sid == '+' || sid == '_' || sid == '|' || sid == '&' || sid == 'R' || sid == 'G' || sid == 'B' || sid == 'Y' || sid == 'C' || sid == 'O' || sid == '<' || sid == '>' || sid == '~' || sid == '`' || sid == '!' || sid == ')';
 }
 void Board::UpdateBoard(sf::RenderWindow& window, sf::Vector3f s, int n)
 {

@@ -29,6 +29,10 @@ bool Piece::IsRoundCompleted(Position p)const
 {
 	return Round.ri == p.ri && Round.ci == p.ci;
 }
+bool Piece::IsAtHome(Position p)const
+{
+	return p.ri == home.ri && p.ci == home.ci;
+}
 void Piece::SetPiece(int n)
 {
 	pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 4);

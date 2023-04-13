@@ -102,13 +102,14 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 		window.display();
 	}
 	Global::turnId = new char[nop];
-	Global::dts = new sf::Texture[nop*6];
+	Global::dts = new sf::Texture[nop * 6];
 	Global::dts[0].loadFromFile("dice_1_red.png");
 	Global::dts[1].loadFromFile("dice_2_red.png");
 	Global::dts[2].loadFromFile("dice_3_red.png");
 	Global::dts[3].loadFromFile("dice_4_red.png");
 	Global::dts[4].loadFromFile("dice_5_red.png");
 	Global::dts[5].loadFromFile("dice_6_red.png");
+
 	switch (nop)
 	{
 	case 2:
@@ -327,6 +328,40 @@ bool Ludo::IsValidNum()const
 	int i = s.ci - 24;
 	return s.ri == 3 && i != score.size();
 }
+bool Ludo::IsPieceAtHome(sf::Vector3f &v)const
+{
+	return b->GetPieceAt(v).GetIsFirst();
+}
+bool Ludo::CanMove()const
+{
+	sf::Vector3f v;
+	char tid = Global::turnId[turn];
+	char pid;
+	for (int i = 0;i < b->GetDim().y;i++)
+	{
+		v.y = i;
+		for (int j = 0;j < b->GetDim().x;j++)
+		{
+			v.x = j;
+			if (!b->IsEmptySpace({ i,j }))
+			{
+				for (int k = 0;k < b->GetPiecesAt({ i,j }).size();k++)
+				{
+					v.z = k;
+					pid = b->GetPieceAt({ v}).GetId();
+					if (tid == pid && !b->GetPieceAt({ v }).IsAtHome({ i,j }))
+						return true;
+				}
+			}
+		}
+	}
+	for (int i = 0;i < score.size();i++)
+	{
+		if (score[i] == 6)
+			return true;
+	}
+	return false;
+}
 void Ludo::SelectPosition(sf::RenderWindow& window)
 {
 	static int i, count6;
@@ -343,8 +378,8 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 	if (!HasRolled && ps[turn]->GetDice().IsDiceThrown(p))
 	{
 		ShowNumber = true;
-		int s = 6;
-		//int s = ps[turn]->RollDice();
+		//int s = 6;
+		int s = ps[turn]->RollDice();
 		ps[turn]->GetDice().DisplayRoll(window, *b, s);
 		score.push_back(s);
 		if (s != 6)
@@ -356,6 +391,7 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 			count6++;
 		if (count6 == 3)
 		{
+			count6 = 0;
 			ShowNumber = false;
 			HasRolled = false;
 			score.clear();
@@ -399,11 +435,18 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 	s = soc;
 	rs = rsoc;
 	d = des;
+	if (HasRolled && !CanMove())
+	{
+		score.clear();
+		TurnCh();
+		HasRolled = false;
+	}
 	if (IsSocSel && IsDesSel)
 	{
 		IsSocSel = false;
 		IsDesSel = false;
 		IsNumSel = false;
+		count6 = 0;
 		if (b->GetPieceAt(rs).GetIsFirst())
 			b->UpdateBoard(window, rs, d);
 		else
