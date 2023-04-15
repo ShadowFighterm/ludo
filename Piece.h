@@ -32,5 +32,6 @@ public:
 	Position GetPosition()const;
 	int GetDir()const;
 	Position GetRound()const;
+	Position GetHome()const;
 };
 

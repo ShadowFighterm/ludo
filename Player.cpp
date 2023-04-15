@@ -8,6 +8,7 @@ Player::Player(sf::Text&name, int turn, sf::Color& clr)
 	SetName(name);
 	SetTurnNo(turn);
 	SetClr(clr);
+	SetHasRolled(false);
 	this->name.setPosition((float)Global::SqrDim.x * 24 + (Global::SqrDim.x / 4), (float)Global::SqrDim.y * 1);
 	this->name.setCharacterSize(40);
 	this->name.setFillColor(this->clr);
@@ -32,6 +33,14 @@ void Player::SetClr(sf::Color& clr)
 void Player::SetTurnNo(int turn)
 {
 	this->turnNo = turn;
+}
+void Player::SetHasRolled(bool b)
+{
+	this->HasRolled = b;
+}
+bool Player::GetHasRolled()const
+{
+	return this->HasRolled;
 }
 const sf::Text& Player::GetName()const
 {

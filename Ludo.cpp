@@ -292,7 +292,6 @@ Ludo::Ludo(sf::RenderWindow& window)
 	MainMenu(window);
 	this->IsDesSel = false;
 	this-> IsSocSel = false;
-	this->HasRolled = false;
 	this->IsNumSel = false;
 	this->turn = 0;
 	this->b = new Board(window, nop);
@@ -536,6 +535,7 @@ void Ludo::MoveAuto(sf::RenderWindow & window)
 {
 	Position soc = s;
 	FindSocAuto();
+	char pid = b->GetPieceAt(rs).GetId();
 	if (b->IsPathClear(rs, score[0]) && b->CanPieceWin(rs, score[0]))
 	{
 		FindDestAuto(score[0]);
@@ -547,18 +547,18 @@ void Ludo::MoveAuto(sf::RenderWindow & window)
 		else
 			b->UpdateBoard(window, *ps[turn], score, rs, score[0]);
 		score.erase(score.begin() + 0);
-		if (score.size() == 0)
+		if (score.size() == 0 && ps[turn]->GetHasRolled())
 		{
-			HasRolled = false;
+			ps[turn]->SetHasRolled (false);
 			TurnCh();
 		}
 	}
-	else
+	else if(score[0]!= 6 || b->GetPieceCountAtHome(pid) == 0)
 	{
 		s = soc;
 		score.clear();
+		ps[turn]->SetHasRolled(false);
 		TurnCh();
-		HasRolled = false;
 		return;
 	}
 }
@@ -576,7 +576,7 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 	s = p;
 	d = p;
 	rs.x = p.ci, rs.y = p.ri;
-	if (!HasRolled && ps[turn]->GetDice().IsDiceThrown(p))
+	if (!ps[turn]->GetHasRolled() && ps[turn]->GetDice().IsDiceThrown(p))
 	{
 		//int s = 6;
 		int s = ps[turn]->RollDice();
@@ -584,7 +584,7 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 		score.push_back(s);
 		if (s != 6)
 		{
-			HasRolled = true;
+			ps[turn]->SetHasRolled(true);
 			count6 = 0;
 		}
 		else
@@ -592,12 +592,12 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 		if (count6 == 3)
 		{
 			count6 = 0;
-			HasRolled = false;
+			ps[turn]->SetHasRolled(false);
 			score.clear();
 			TurnCh();
 		}
 	}
-	else if (HasRolled && !IsSocSel && InBound())
+	else if (ps[turn]->GetHasRolled() && !IsSocSel && InBound())
 	{
 		for (int k = 0;k < b->GetPiecesAt(s).size();k++)
 		{
@@ -634,7 +634,7 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 	s = soc;
 	rs = rsoc;
 	d = des;
-	if (HasRolled && !IsSocSel && !CanMove())
+	if (ps[turn]->GetHasRolled() && !IsSocSel && !CanMove())
 	{
 		window.clear();
 		b->DrawBoard(window);
@@ -644,8 +644,8 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 		window.display();
 		sf::sleep(sf::seconds(0.5));
 		score.clear();
+		ps[turn]->SetHasRolled(false);
 		TurnCh();
-		HasRolled = false;
 	}
 	if (IsSocSel && IsDesSel)
 	{
@@ -661,13 +661,13 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 			Update = false;
 		if(Update)
 			score.erase(score.begin() + i);
-		if (score.size() == 0)
+		if (score.size() == 0 && ps[turn]->GetHasRolled())
 		{
-			HasRolled = false;
+			ps[turn]->SetHasRolled(false);
 			TurnCh();
 		}
 	}
-	if (HasRolled && !IsSocSel && CanMoveAuto())
+	if (ps[turn]->GetHasRolled() && !IsSocSel && CanMoveAuto())
 	{
 		window.clear();
 		b->DrawBoard(window);

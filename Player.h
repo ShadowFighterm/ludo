@@ -8,6 +8,7 @@ class Dice;
 class Player
 {
 private:
+	bool HasRolled;
 	sf::Text name;
 	sf::Color clr;
 	int turnNo;
@@ -19,6 +20,8 @@ public:
 	void SetName(sf::Text& name);
 	void SetClr(sf::Color& clr);
 	void SetTurnNo(int turn);
+	void SetHasRolled(bool b);
+	bool GetHasRolled()const;
 	const sf::Text& GetName()const;
 	const sf::Color& GetClr()const;
 	Dice GetDice()const;

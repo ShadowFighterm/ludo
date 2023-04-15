@@ -20,14 +20,16 @@ private:
 	vector<vector<vector<Piece>>> pcs;
 	void DrawBG(sf::RenderWindow& window)const;
 	void DrawStar(sf::RenderWindow& window, Position p);
+	bool IsCheckpoint(Position p)const;
 	void SetPieces();
 public:
 	Board(sf::RenderWindow& window, int nop);
 	int GetPieceCount(char id)const;
+	int GetPieceCountAtHome(char id)const;
 	void DrawBoard(sf::RenderWindow& window)const;
 	void DrawPieces(sf::RenderWindow& window)const;
 	void UpdateBoard(sf::RenderWindow& window, sf::Vector3f s, Position d);
-	void UpdateBoard(sf::RenderWindow& window, const Player& p, const vector<int>&score, sf::Vector3f s, int n);
+	void UpdateBoard(sf::RenderWindow& window, Player& p, const vector<int>&score, sf::Vector3f s, int n);
 	bool IsValidPath(Position p)const;
 	bool IsEmptySpace(Position p)const;
 	bool IsPathClear(sf::Vector3f&s, int n)const;

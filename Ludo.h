@@ -10,7 +10,6 @@ class Ludo
 private:
 	bool IsSocSel;
 	bool IsDesSel;
-	bool HasRolled;
 	bool IsNumSel;
 	vector<int>score;
 	sf::Vector3f rs;

@@ -230,6 +230,22 @@ int Board::GetPieceCount(char id)const
 	}
 	return count;
 }
+int Board::GetPieceCountAtHome(char id)const
+{
+	int count = 0;
+	for (int i = 0;i < dim.y;i++)
+	{
+		for (int j = 0;j < dim.x;j++)
+		{
+			for (int k = 0;k < pcs[i][j].size();k++)
+			{
+				if (pcs[i][j][k].GetId() == id && pcs[i][j][j].IsAtHome({ i,j }))
+					count++;
+			}
+		}
+	}
+	return count;
+}
 void Board::DrawPieces(sf::RenderWindow& window)const
 {
 	for (int i = 0;i < dim.y;i++)
@@ -252,6 +268,13 @@ void Board::UpdateBoard(sf::RenderWindow& window, sf::Vector3f s, Position d)
 	this->pcs[d.ri][d.ci].push_back(this->pcs[s.y][s.x][s.z]);
 	this->pcs[s.y][s.x].erase(this->pcs[s.y][s.x].begin() + s.z);
 	SetPieces();
+}
+bool Board::IsCheckpoint(Position p)const
+{
+	char sid = shp[p.ri][p.ci]->GetId();
+	if (sid == '/' || sid == '*' || sid == '+' || sid == '_' || sid == '|' || sid == '&' || sid == ')' || sid == '!' || sid == '?' || sid == '`' || sid == '<' || sid == '>' || sid == '~')
+		return true;
+	return false;
 }
 bool Board::IsValidPath(Position p)const
 {
@@ -455,12 +478,12 @@ bool Board::IsPathClear(sf::Vector3f&s, int n)const
 			}
 			break;
 		}
-		if (pcs[d.ri][d.ci].size() == 2)
+		if (pcs[d.ri][d.ci].size() == 2 && !IsCheckpoint(d))
 			return false;
 	}
 	return true;
 }
-void Board::UpdateBoard(sf::RenderWindow& window, const Player&p, const vector<int>&score, sf::Vector3f s, int n)
+void Board::UpdateBoard(sf::RenderWindow& window, Player&p, const vector<int>&score, sf::Vector3f s, int n)
 {
 	int count = 0;
 	Position d;
@@ -554,6 +577,14 @@ void Board::UpdateBoard(sf::RenderWindow& window, const Player&p, const vector<i
 		}
 		if (count == n)
 		{
+			if (!IsCheckpoint(d) && !IsEmptySpace(d) && pcs[d.ri][d.ci][0].GetId() != pcs[s.y][s.x][s.z].GetId())
+			{
+				pcs[d.ri][d.ci][0].Move(window, pcs[d.ri][d.ci][0].GetHome());
+				pcs[d.ri][d.ci][0].SetIsFirst(true);
+				pcs[pcs[d.ri][d.ci][0].GetHome().ri][pcs[d.ri][d.ci][0].GetHome().ci].push_back(pcs[d.ri][d.ci][0]);
+				pcs[d.ri][d.ci].erase(pcs[d.ri][d.ci].begin() + 0);
+				p.SetHasRolled(false);
+			}
 			this->pcs[d.ri][d.ci].push_back(this->pcs[s.y][s.x][s.z]);
 			this->pcs[s.y][s.x].erase(this->pcs[s.y][s.x].begin() + s.z);
 			SetPieces();

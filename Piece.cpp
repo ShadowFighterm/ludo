@@ -79,3 +79,7 @@ Position Piece::GetRound()const
 {
 	return this->Round;
 }
+Position Piece::GetHome()const
+{
+	return this->home;
+}
