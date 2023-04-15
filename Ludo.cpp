@@ -45,7 +45,7 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 		if (p2.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
 		{
 			p2.setCharacterSize(40);
-			p2.setFillColor(sf::Color::Red);
+			p2.setFillColor(sf::Color::Color(173, 234, 24));
 		}
 		else
 		{
@@ -55,7 +55,7 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 		if (p4.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
 		{
 			p4.setCharacterSize(40);
-			p4.setFillColor(sf::Color::Red);
+			p4.setFillColor(sf::Color::Color(173, 234, 24));
 		}
 		else
 		{
@@ -66,7 +66,7 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 		if (p6.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
 		{
 			p6.setCharacterSize(40);
-			p6.setFillColor(sf::Color::Red);
+			p6.setFillColor(sf::Color::Color(173, 234, 24));
 		}
 		else
 		{
@@ -359,6 +359,7 @@ bool Ludo::IsValidNum()const
 	int i = s.ci - 24;
 	return s.ri == 3 && i != score.size() && i >= 0;
 }
+
 bool Ludo::CanMove()const
 {
 	sf::Vector3f v;

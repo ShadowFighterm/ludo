@@ -281,6 +281,7 @@ bool Board::IsValidPath(Position p)const
 	char sid = shp[p.ri][p.ci]->GetId();
 	return sid == '.' || sid == '?' || sid == '/' || sid == '*' || sid == '+' || sid == '_' || sid == '|' || sid == '&' || sid == 'R' || sid == 'G' || sid == 'B' || sid == 'Y' || sid == 'C' || sid == 'O' || sid == '<' || sid == '>' || sid == '~' || sid == '`' || sid == '!' || sid == ')';
 }
+
 bool Board::CanPieceWin(sf::Vector3f& s, int n)const
 {
 	int count = 0;
