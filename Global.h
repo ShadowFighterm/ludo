@@ -9,7 +9,7 @@ public:
 	static sf::Texture* ts;
 	static sf::Texture* dts;
 	static sf::Font f;
-
+	static sf::Font f1;
 	void static getRowColbyLeftClick(int& rpos, int& cpos, sf::RenderWindow&window);
 };
 

@@ -15,6 +15,12 @@ Board::Board(sf::RenderWindow& window, int nop)
 {
 	this->dim.x = 24;
 	this->dim.y = 15;
+	win1.setTexture(Global::ts[10]);
+	win1.setPosition((float)6 * Global::SqrDim.x, (float)6 * Global::SqrDim.y);
+	win1.setScale((float)(3 * Global::SqrDim.x) / Global::ts[10].getSize().x, (float)(3 * Global::SqrDim.y) / Global::ts[10].getSize().y);
+	win2.setTexture(Global::ts[11]);
+	win2.setScale((float)(3 * Global::SqrDim.x) / Global::ts[11].getSize().x, (float)(3 * Global::SqrDim.y) / Global::ts[11].getSize().y);
+	win2.setPosition((float)15 * Global::SqrDim.x, (float)6 * Global::SqrDim.y);
 	ludo.setCharacterSize(30);
 	ludo.setFillColor(sf::Color::Black);
 	ludo.setFont(Global::f);
@@ -205,6 +211,8 @@ void Board::DrawBoard(sf::RenderWindow& window)const
 		}
 	}
 	window.draw(ludo);
+	window.draw(win1);
+	window.draw(win2);
 }
 int Board::GetPieceCount(char id)const
 {
@@ -250,7 +258,209 @@ bool Board::IsValidPath(Position p)const
 	char sid = shp[p.ri][p.ci]->GetId();
 	return sid == '.' || sid == '?' || sid == '/' || sid == '*' || sid == '+' || sid == '_' || sid == '|' || sid == '&' || sid == 'R' || sid == 'G' || sid == 'B' || sid == 'Y' || sid == 'C' || sid == 'O' || sid == '<' || sid == '>' || sid == '~' || sid == '`' || sid == '!' || sid == ')';
 }
-void Board::UpdateBoard(sf::RenderWindow& window, sf::Vector3f s, int n)
+bool Board::CanPieceWin(sf::Vector3f& s, int n)const
+{
+	int count = 0;
+	Position d;
+	d.ri = s.y, d.ci = s.x;
+	Piece p = pcs[s.y][s.x][s.z];
+	while (count != n)
+	{
+		switch (p.GetDir())
+		{
+		case Global::UP:
+			d.ri--;
+			if (d.ri != -1 && IsValidPath(d))
+			{
+				count++;
+				if (p.IsRoundCompleted(d))
+					p.SetDir(Global::RIGHT);
+			}
+			else
+			{
+				if (d.ri == -1 || shp[d.ri][d.ci]->GetId() != '#')
+					d.ri++;
+				if (d.ci - 1 != -1 && IsValidPath({ d.ri,d.ci - 1 }))
+					p.SetDir(Global::LEFT);
+				else if (IsValidPath({ d.ri,d.ci + 1 }))
+					p.SetDir(Global::RIGHT);
+				else
+				{
+					if (count + 1 == n && p.IsPieceWin(d))
+						return true;
+					else
+						return false;
+				}
+			}
+			break;
+		case Global::DOWN:
+			d.ri++;
+			if (d.ri != dim.y && IsValidPath(d))
+			{
+				count++;
+				if (p.IsRoundCompleted(d))
+					p.SetDir(Global::LEFT);
+			}
+			else
+			{
+				if (d.ri == dim.y || shp[d.ri][d.ci]->GetId() != '#')
+					d.ri--;
+				if (d.ci + 1 != dim.x && IsValidPath({ d.ri,d.ci + 1 }))
+					p.SetDir(Global::RIGHT);
+				else if (IsValidPath({ d.ri,d.ci - 1 }))
+					p.SetDir(Global::LEFT);
+				else
+				{
+					if (count + 1 == n && p.IsPieceWin(d))
+						return true;
+					else
+						return false;
+				}
+			}
+			break;
+		case Global::LEFT:
+			d.ci--;
+			if (d.ci != -1 && IsValidPath(d))
+			{
+				count++;
+				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					p.SetDir(Global::UP);
+			}
+			else
+			{
+				if (d.ci == -1 || shp[d.ri][d.ci]->GetId() != '#')
+					d.ci++;
+				if (IsValidPath({ d.ri - 1,d.ci }))
+					p.SetDir(Global::UP);
+				else if (d.ri + 1 != dim.y && IsValidPath({ d.ri + 1,d.ci }))
+					p.SetDir(Global::DOWN);
+				else
+				{
+					if (count + 1 == n && p.IsPieceWin(d))
+						return true;
+					else
+						return false;
+				}
+			}
+			break;
+		case Global::RIGHT:
+			d.ci++;
+			if (d.ci != dim.x && IsValidPath(d))
+			{
+				count++;
+				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					p.SetDir(Global::DOWN);
+			}
+			else
+			{
+				if (d.ci == dim.x || shp[d.ri][d.ci]->GetId() != '#')
+					d.ci--;
+				if (d.ri - 1 != -1 && IsValidPath({ d.ri - 1,d.ci }))
+					p.SetDir(Global::UP);
+				else if (IsValidPath({ d.ri + 1,d.ci }))
+					p.SetDir(Global::DOWN);
+				else
+				{
+					if (count + 1 == n && p.IsPieceWin(d))
+						return true;
+					else
+						return false;
+				}
+			}
+			break;
+		}
+	}
+	return true;
+}
+bool Board::IsPathClear(sf::Vector3f&s, int n)const
+{
+	int count = 0;
+	Position d;
+	d.ri = s.y, d.ci = s.x;
+	Piece p = pcs[s.y][s.x][s.z];
+	while (count != n)
+	{
+		switch (p.GetDir())
+		{
+		case Global::UP:
+			d.ri--;
+			if (d.ri != -1 && IsValidPath(d))
+			{
+				count++;
+				if (p.IsRoundCompleted(d))
+					p.SetDir(Global::RIGHT);
+			}
+			else
+			{
+				if (d.ri == -1 || shp[d.ri][d.ci]->GetId() != '#')
+					d.ri++;
+				if (d.ci - 1 != -1 && IsValidPath({ d.ri,d.ci - 1 }))
+					p.SetDir(Global::LEFT);
+				else if (IsValidPath({ d.ri,d.ci + 1 }))
+					p.SetDir(Global::RIGHT);
+			}
+			break;
+		case Global::DOWN:
+			d.ri++;
+			if (d.ri != dim.y && IsValidPath(d))
+			{
+				count++;
+				if (p.IsRoundCompleted(d))
+					p.SetDir(Global::LEFT);
+			}
+			else
+			{
+				if (d.ri == dim.y || shp[d.ri][d.ci]->GetId() != '#')
+					d.ri--;
+				if (d.ci + 1 != dim.x && IsValidPath({ d.ri,d.ci + 1 }))
+					p.SetDir(Global::RIGHT);
+				else if (IsValidPath({ d.ri,d.ci - 1 }))
+					p.SetDir(Global::LEFT);
+			}
+			break;
+		case Global::LEFT:
+			d.ci--;
+			if (d.ci != -1 && IsValidPath(d))
+			{
+				count++;
+				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					p.SetDir(Global::UP);
+			}
+			else
+			{
+				if (d.ci == -1 || shp[d.ri][d.ci]->GetId() != '#')
+					d.ci++;
+				if (IsValidPath({ d.ri - 1,d.ci }))
+					p.SetDir(Global::UP);
+				else if (d.ri + 1 != dim.y && IsValidPath({ d.ri + 1,d.ci }))
+					p.SetDir(Global::DOWN);
+			}
+			break;
+		case Global::RIGHT:
+			d.ci++;
+			if (d.ci != dim.x && IsValidPath(d))
+			{
+				count++;
+				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					p.SetDir(Global::DOWN);
+			}
+			else
+			{
+				if (d.ci == dim.x || shp[d.ri][d.ci]->GetId() != '#')
+					d.ci--;
+				if (d.ri - 1 != -1 && IsValidPath({ d.ri - 1,d.ci }))
+					p.SetDir(Global::UP);
+				else if (IsValidPath({ d.ri + 1,d.ci }))
+					p.SetDir(Global::DOWN);
+			}
+			break;
+		}
+		if (pcs[d.ri][d.ci].size() == 2)
+			return false;
+	}
+	return true;
+}
+void Board::UpdateBoard(sf::RenderWindow& window, const Player&p, const vector<int>&score, sf::Vector3f s, int n)
 {
 	int count = 0;
 	Position d;
@@ -352,6 +562,8 @@ void Board::UpdateBoard(sf::RenderWindow& window, sf::Vector3f s, int n)
 		window.clear();
 		DrawBoard(window);
 		DrawPieces(window);
+		p.GetDice().DrawMainDice(window);
+		p.GetDice().DisplayNumbers(window, score);
 		window.display();
 		sf::sleep(sf::seconds(0.1));
 	}

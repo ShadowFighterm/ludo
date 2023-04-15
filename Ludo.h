@@ -11,7 +11,6 @@ private:
 	bool IsSocSel;
 	bool IsDesSel;
 	bool HasRolled;
-	bool ShowNumber;
 	bool IsNumSel;
 	vector<int>score;
 	sf::Vector3f rs;
@@ -27,8 +26,11 @@ private:
 	bool IsValidDestin()const;
 	void MainMenu(sf::RenderWindow& window);
 	void SelectPosition(sf::RenderWindow& window);
-	bool IsPieceAtHome(sf::Vector3f& v)const;
 	bool CanMove()const;
+	void FindSocAuto();
+	void FindDestAuto(int n);
+	bool CanMoveAuto()const;
+	void MoveAuto(sf::RenderWindow&window);
 	void TurnCh();
 public:
 	Ludo(sf::RenderWindow& window);

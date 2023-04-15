@@ -19,6 +19,7 @@ public:
 	Piece(Position pos, int dir, char id);
 	bool IsRoundCompleted(Position p)const;
 	bool IsAtHome(Position p)const;
+	bool IsPieceWin(Position p)const;
 	void DrawPiece(sf::RenderWindow& window)const;
 	void Move(sf::RenderWindow& window, Position p);
 	void SetId(char id);

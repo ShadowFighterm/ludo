@@ -196,6 +196,7 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 	sf::RectangleShape box;
 	sf::Text name, input;
 	string sname, sinput;
+	sf::Color clr;
 	name.setCharacterSize(30);
 	name.setPosition((float)window.getSize().x / 5, (float)window.getSize().y / 2 + 10);
 	name.setFillColor(sf::Color::Black);
@@ -227,7 +228,30 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 		{
-			ps[i] = new Player(sinput, i, Global::turnId[i]);
+			switch (Global::turnId[i])
+			{
+			case 'r':
+				clr = sf::Color::Red;
+				break;
+			case 'b':
+				clr = sf::Color::Blue;
+				break;
+			case 'g':
+				clr = sf::Color::Green;
+				break;
+			case 'y':
+				clr = sf::Color::Yellow;
+				break;
+			case 'c':
+				clr = sf::Color::Cyan;
+				break;
+			case 'o':
+				clr.r = 255;
+				clr.g = 165;
+				clr.b = 0;
+				break;
+			}
+			ps[i] = new Player(input, i, clr);
 			sinput.clear();
 			input.setString(sinput);
 			i++;
@@ -250,8 +274,9 @@ Ludo::Ludo(sf::RenderWindow& window)
 {
 	Global::SqrDim.x = (float)window.getSize().x / (24 + 3);
 	Global::SqrDim.y = (float)window.getSize().y / 15;
-	Global::ts = new sf::Texture[10];
+	Global::ts = new sf::Texture[12];
 	Global::f.loadFromFile("arial.ttf");
+	Global::f1.loadFromFile("vinque.otf");
 	Global::ts[0].loadFromFile("red_piece.png");
 	Global::ts[1].loadFromFile("green_piece.png");
 	Global::ts[2].loadFromFile("blue_piece.png");
@@ -262,11 +287,13 @@ Ludo::Ludo(sf::RenderWindow& window)
 	Global::ts[7].loadFromFile("background.jpg");
 	Global::ts[8].loadFromFile("logo.png");
 	Global::ts[9].loadFromFile("menu_bg.jpg");
+	Global::ts[10].loadFromFile("win_1.png");
+	Global::ts[11].loadFromFile("win_2.png");
 	MainMenu(window);
 	this->IsDesSel = false;
 	this-> IsSocSel = false;
 	this->HasRolled = false;
-	this->ShowNumber = false;
+	this->IsNumSel = false;
 	this->turn = 0;
 	this->b = new Board(window, nop);
 }
@@ -289,8 +316,8 @@ void Ludo::Play(sf::RenderWindow& window)
 		b->DrawBoard(window);
 		b->DrawPieces(window);
 		ps[turn]->GetDice().DrawMainDice(window);
-		if (ShowNumber)
-			ps[turn]->GetDice().DisplayNumbers(window, score);
+		ps[turn]->GetDice().DisplayNumbers(window, score);
+		ps[turn]->DisplayName(window);
 		window.display();
 	}
 }
@@ -326,11 +353,7 @@ bool Ludo::IsValidDestin()const
 bool Ludo::IsValidNum()const
 {
 	int i = s.ci - 24;
-	return s.ri == 3 && i != score.size();
-}
-bool Ludo::IsPieceAtHome(sf::Vector3f &v)const
-{
-	return b->GetPieceAt(v).GetIsFirst();
+	return s.ri == 3 && i != score.size() && i >= 0;
 }
 bool Ludo::CanMove()const
 {
@@ -362,9 +385,187 @@ bool Ludo::CanMove()const
 	}
 	return false;
 }
+bool Ludo::CanMoveAuto()const
+{
+	int count = 0;
+	sf::Vector3f v;
+	char tid = Global::turnId[turn];
+	for (int i = 0;i < b->GetDim().y;i++)
+	{
+		v.y = i;
+		for (int j = 0;j < b->GetDim().x;j++)
+		{
+			v.x = j;
+			if (!b->IsEmptySpace({ i,j }))
+			{
+				for (int k = 0; k < b->GetPiecesAt({ i,j }).size();k++)
+				{
+					v.z = k;
+					if (tid == b->GetPieceAt(v).GetId() && !b->GetPieceAt(v).IsAtHome({ i,j }))
+					{
+						count++;
+						if (count == 2)
+							return false;
+					}
+
+
+				}
+			}
+		}
+	}
+	for (int i = 0;i < score.size();i++)
+	{
+		if (score[i] == 6)
+			return false;
+	}
+	if (score.size() != 1)
+		return false;
+	return true;
+}
+void Ludo::FindSocAuto()
+{
+	sf::Vector3f v;
+	char tid = Global::turnId[turn];
+	for (int i = 0;i < b->GetDim().y;i++)
+	{
+		v.y = i;
+		for (int j = 0;j < b->GetDim().x;j++)
+		{
+			v.x = j;
+			if (!b->IsEmptySpace({ i,j }))
+			{
+				for (int k = 0; k < b->GetPiecesAt({ i,j }).size();k++)
+				{
+					v.z = k;
+					if (tid == b->GetPieceAt(v).GetId() && !b->GetPieceAt(v).IsAtHome({ i,j }))
+					{
+						s = { i,j };
+						rs = v;
+						return;
+					}
+				}
+			}
+		}
+	}
+}
+void Ludo::FindDestAuto(int n)
+{
+	d = { s.ri,s.ci };
+	Piece p = b->GetPieceAt(rs);
+	int count = 0;
+	while (count != n)
+	{
+		switch (p.GetDir())
+		{
+		case Global::UP:
+			d.ri--;
+			if (d.ri != -1 && b->IsValidPath(d))
+			{
+				count++;
+				if (p.IsRoundCompleted(d))
+					p.SetDir(Global::RIGHT);
+			}
+			else
+			{
+				if (d.ri == -1 || b->GetShapeAt({d.ri,d.ci})->GetId() != '#')
+					d.ri++;
+				if (d.ci - 1 != -1 && b->IsValidPath({ d.ri,d.ci - 1 }))
+					p.SetDir(Global::LEFT);
+				else if (b->IsValidPath({ d.ri,d.ci + 1 }))
+					p.SetDir(Global::RIGHT);
+			}
+			break;
+		case Global::DOWN:
+			d.ri++;
+			if (d.ri != b->GetDim().y && b->IsValidPath(d))
+			{
+				count++;
+				if (p.IsRoundCompleted(d))
+					p.SetDir(Global::LEFT);
+			}
+			else
+			{
+				if (d.ri == b->GetDim().y || b->GetShapeAt({ d.ri,d.ci })->GetId() != '#')
+					d.ri--;
+				if (d.ci + 1 != b->GetDim().x && b->IsValidPath({d.ri,d.ci + 1}))
+					p.SetDir(Global::RIGHT);
+				else if (b->IsValidPath({ d.ri,d.ci - 1 }))
+					p.SetDir(Global::LEFT);
+			}
+			break;
+		case Global::LEFT:
+			d.ci--;
+			if (d.ci != -1 && b->IsValidPath(d))
+			{
+				count++;
+				if (p.IsRoundCompleted(d))
+					p.SetDir(Global::UP);
+			}
+			else
+			{
+				if (d.ci == -1 || b->GetShapeAt({ d.ri,d.ci })->GetId() != '#')
+					d.ci++;
+				if (b->IsValidPath({ d.ri - 1,d.ci }))
+					p.SetDir(Global::UP);
+				else if (d.ri + 1 != b->GetDim().y && b->IsValidPath({d.ri + 1,d.ci}))
+					p.SetDir(Global::DOWN);
+			}
+			break;
+		case Global::RIGHT:
+			d.ci++;
+			if (d.ci != b->GetDim().x && b->IsValidPath(d))
+			{
+				count++;
+				if (p.IsRoundCompleted(d))
+					p.SetDir(Global::DOWN);
+			}
+			else
+			{
+				if (d.ci == b->GetDim().x || b->GetShapeAt({ d.ri,d.ci })->GetId() != '#')
+					d.ci--;
+				if (d.ri - 1 != -1 && b->IsValidPath({ d.ri - 1,d.ci }))
+					p.SetDir(Global::UP);
+				else if (b->IsValidPath({ d.ri + 1,d.ci }))
+					p.SetDir(Global::DOWN);
+			}
+			break;
+		}
+	}
+}
+void Ludo::MoveAuto(sf::RenderWindow & window)
+{
+	Position soc = s;
+	FindSocAuto();
+	if (b->IsPathClear(rs, score[0]) && b->CanPieceWin(rs, score[0]))
+	{
+		FindDestAuto(score[0]);
+		IsSocSel = false;
+		IsDesSel = false;
+		IsNumSel = false;
+		if (b->GetPieceAt(rs).GetIsFirst())
+			b->UpdateBoard(window, rs, d);
+		else
+			b->UpdateBoard(window, *ps[turn], score, rs, score[0]);
+		score.erase(score.begin() + 0);
+		if (score.size() == 0)
+		{
+			HasRolled = false;
+			TurnCh();
+		}
+	}
+	else
+	{
+		s = soc;
+		score.clear();
+		TurnCh();
+		HasRolled = false;
+		return;
+	}
+}
 void Ludo::SelectPosition(sf::RenderWindow& window)
 {
 	static int i, count6;
+	bool Update = true;
 	sf::Vector3f rsoc = rs;
 	Position soc = s;
 	Position des = d;
@@ -377,7 +578,6 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 	rs.x = p.ci, rs.y = p.ri;
 	if (!HasRolled && ps[turn]->GetDice().IsDiceThrown(p))
 	{
-		ShowNumber = true;
 		//int s = 6;
 		int s = ps[turn]->RollDice();
 		ps[turn]->GetDice().DisplayRoll(window, *b, s);
@@ -392,7 +592,6 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 		if (count6 == 3)
 		{
 			count6 = 0;
-			ShowNumber = false;
 			HasRolled = false;
 			score.clear();
 			TurnCh();
@@ -420,7 +619,7 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 		if (!b->GetPieceAt(rs).GetIsFirst())
 			IsDesSel = true;
 	}
-	else if (!IsDesSel && IsSocSel && IsNumSel && InBound() && IsValidDestin())
+	else if (!IsDesSel && IsSocSel && IsNumSel && InBound() && IsValidDestin() && score[i] == 6)
 	{
 		des = p;
 		IsDesSel = true;
@@ -435,8 +634,15 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 	s = soc;
 	rs = rsoc;
 	d = des;
-	if (HasRolled && !CanMove())
+	if (HasRolled && !IsSocSel && !CanMove())
 	{
+		window.clear();
+		b->DrawBoard(window);
+		b->DrawPieces(window);
+		ps[turn]->GetDice().DisplayNumbers(window, score);
+		ps[turn]->GetDice().DrawMainDice(window);
+		window.display();
+		sf::sleep(sf::seconds(0.5));
 		score.clear();
 		TurnCh();
 		HasRolled = false;
@@ -449,14 +655,28 @@ void Ludo::SelectPosition(sf::RenderWindow& window)
 		count6 = 0;
 		if (b->GetPieceAt(rs).GetIsFirst())
 			b->UpdateBoard(window, rs, d);
+		else if (b->CanPieceWin(rs, score[i]) && b->IsPathClear(rs, score[i]))
+			b->UpdateBoard(window, *ps[turn], score , rs, score[i]);
 		else
-			b->UpdateBoard(window, rs, score[i]);
-		score.erase(score.begin() + i);
+			Update = false;
+		if(Update)
+			score.erase(score.begin() + i);
 		if (score.size() == 0)
 		{
-			ShowNumber = false;
 			HasRolled = false;
 			TurnCh();
 		}
+	}
+	if (HasRolled && !IsSocSel && CanMoveAuto())
+	{
+		window.clear();
+		b->DrawBoard(window);
+		b->DrawPieces(window);
+		ps[turn]->GetDice().DisplayNumbers(window, score);
+		ps[turn]->GetDice().DrawMainDice(window);
+		window.display();
+		sf::sleep(sf::seconds(0.5));
+		MoveAuto(window);
+		count6 = 0;
 	}
 }

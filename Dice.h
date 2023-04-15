@@ -4,6 +4,7 @@
 #include"Board.h"
 #include"Position.h"
 using namespace std;
+class Board;
 class Dice
 {
 private:
@@ -14,7 +15,7 @@ public:
 	int Roll()const;
 	void DrawMainDice(sf::RenderWindow& window)const;
 	bool IsDiceThrown(Position p)const;
-	void DisplayNumbers(sf::RenderWindow& window, vector<int> n);
+	void DisplayNumbers(sf::RenderWindow& window, const vector<int>& n);
 	void DisplayRoll(sf::RenderWindow& window,const Board&b, int n);
 	sf::Sprite GetDiceAt(int i)const;
 };

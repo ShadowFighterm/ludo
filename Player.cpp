@@ -2,40 +2,44 @@
 #include<iostream>
 #include<string>
 using namespace std;
-Player::Player(string name, int turn, int clr)
+Player::Player(sf::Text&name, int turn, sf::Color& clr)
 {
 	this->d = new Dice(turn);
 	SetName(name);
 	SetTurnNo(turn);
 	SetClr(clr);
+	this->name.setPosition((float)Global::SqrDim.x * 24 + (Global::SqrDim.x / 4), (float)Global::SqrDim.y * 1);
+	this->name.setCharacterSize(40);
+	this->name.setFillColor(this->clr);
 }
 int Player::RollDice()const
 {
 	return this->d->Roll();
 }
-void Player::SetName(string name)
+void Player::DisplayName(sf::RenderWindow& window)const
 {
-	this->name = name;
+	window.draw(name);
 }
-void Player::SetClr(int clr)
+void Player::SetName(sf::Text& name)
+{
+	this->name.setString(name.getString());
+	this->name.setFont(Global::f1);
+}
+void Player::SetClr(sf::Color& clr)
 {
 	this->clr = clr;
 }
 void Player::SetTurnNo(int turn)
 {
-	this->tunrNo = turn;
+	this->turnNo = turn;
 }
-string Player::GetName()const
+const sf::Text& Player::GetName()const
 {
 	return this->name;
 }
-int Player::GetClr()const
+const sf::Color& Player::GetClr()const
 {
 	return this->clr;
-}
-int Player::GetTurnNo()const
-{
-	return this->tunrNo;
 }
 Dice Player::GetDice()const
 {

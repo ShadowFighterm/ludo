@@ -1,24 +1,26 @@
 #pragma once
 #include<string>
 #include"Dice.h"
+#include"Global.h"
+#include<SFML/Graphics.hpp>
 using namespace std;
 class Dice;
 class Player
 {
 private:
-	string name;
-	int tunrNo;
-	int clr;
+	sf::Text name;
+	sf::Color clr;
+	int turnNo;
 	Dice*d;
 public:
-	Player(string name, int turn, int clr);
+	Player(sf::Text&name,int turn, sf::Color&clr);
 	int RollDice()const;
-	void SetName(string name);
-	void SetClr(int clr);
+	void DisplayName(sf::RenderWindow& window)const;
+	void SetName(sf::Text& name);
+	void SetClr(sf::Color& clr);
 	void SetTurnNo(int turn);
-	string GetName()const;
-	int GetClr()const;
-	int GetTurnNo()const;
+	const sf::Text& GetName()const;
+	const sf::Color& GetClr()const;
 	Dice GetDice()const;
 };
 

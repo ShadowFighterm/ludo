@@ -8,10 +8,10 @@ Piece::Piece(Position p, int dir, char id)
 	SetDir(dir);
 	SetId(id);
 	this->home = p;
-	this->Scale.x = 0.1;
-	this->Scale.y = 0.1;
-	this->pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 4);
-	this->pos.y = (float)p.ri * Global::SqrDim.y + (Global::SqrDim.y / 8);
+	this->Scale.x = 0.02;
+	this->Scale.y = 0.02;
+	this->pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 8);
+	this->pos.y = (float)p.ri * Global::SqrDim.y + (Global::SqrDim.y / 16);
 }
 void Piece::DrawPiece(sf::RenderWindow& window)const
 {
@@ -20,8 +20,8 @@ void Piece::DrawPiece(sf::RenderWindow& window)const
 void Piece::Move(sf::RenderWindow& window, Position p)
 {
 	this->p = p;
-	this->pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 4);
-	this->pos.y = (float)p.ri * Global::SqrDim.y + (Global::SqrDim.y / 8);
+	this->pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 8);
+	this->pos.y = (float)p.ri * Global::SqrDim.y + (Global::SqrDim.y / 16);
 	this->pc.setPosition(this->pos);
 	this->IsFirstMove = false;
 }
@@ -33,9 +33,13 @@ bool Piece::IsAtHome(Position p)const
 {
 	return p.ri == home.ri && p.ci == home.ci;
 }
+bool Piece::IsPieceWin(Position p)const
+{
+	return p.ri == win.ri && p.ci == win.ci;
+}
 void Piece::SetPiece(int n)
 {
-	pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 4);
+	pos.x = (float)p.ci * Global::SqrDim.x + (Global::SqrDim.x / 8);
 	pos.x += n * 5;
 	this->pc.setPosition(pos);
 }
