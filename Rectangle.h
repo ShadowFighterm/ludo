@@ -8,6 +8,6 @@ private:
 	sf::RectangleShape rec;
 public:
 	Rectangle(sf::Color fillClr, sf::Color outClr, Position p, char id);
-	void DrawShape(sf::RenderWindow& window)const override;
+	void DrawShape(sf::RenderWindow& window)override;
 };
 

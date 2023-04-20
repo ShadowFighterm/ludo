@@ -34,6 +34,7 @@ Board::Board(sf::RenderWindow& window, int nop)
 	sf::Color orange(255, 165, 0);
 	sf::Color goldenRod(218, 165, 32);
 	sf::Color khaki(240, 230, 140);
+	sf::Color slateGray(112, 128, 144);
 	Position p;
 	ifstream cin1("BoardLoad.txt");
 	ofstream cout1("PieceLoad.txt");
@@ -214,7 +215,11 @@ void Board::DrawBoard(sf::RenderWindow& window)const
 	window.draw(win1);
 	window.draw(win2);
 }
-int Board::GetPieceCount(char id)const
+bool Board::IsOnBoard(Position p)const
+{
+	return IsValidPath(p);
+}
+int Board::GetPieceCountOnBoard(char id)const
 {
 	int count = 0;
 	for(int i=0;i<dim.y;i++ )
@@ -223,7 +228,7 @@ int Board::GetPieceCount(char id)const
 		{
 			for (int k = 0;k < pcs[i][j].size();k++)
 			{
-				if (pcs[i][j][k].GetId() == id)
+				if (pcs[i][j][k].GetId() == id && IsOnBoard({i,j}))
 					count++;
 			}
 		}
@@ -239,7 +244,7 @@ int Board::GetPieceCountAtHome(char id)const
 		{
 			for (int k = 0;k < pcs[i][j].size();k++)
 			{
-				if (pcs[i][j][k].GetId() == id && pcs[i][j][j].IsAtHome({ i,j }))
+				if (pcs[i][j][k].GetId() == id && pcs[i][j][k].IsAtHome({ i,j }))
 					count++;
 			}
 		}
@@ -397,9 +402,12 @@ bool Board::CanPieceWin(sf::Vector3f& s, int n)const
 }
 bool Board::IsPathClear(sf::Vector3f&s, int n)const
 {
+	bool jota = false;
 	int count = 0;
 	Position d;
 	d.ri = s.y, d.ci = s.x;
+	if (n % 2 == 0 && pcs[s.y][s.x].size() == 2 && !IsCheckpoint(d))
+		jota = true;
 	Piece p = pcs[s.y][s.x][s.z];
 	while (count != n)
 	{
@@ -421,6 +429,8 @@ bool Board::IsPathClear(sf::Vector3f&s, int n)const
 					p.SetDir(Global::LEFT);
 				else if (IsValidPath({ d.ri,d.ci + 1 }))
 					p.SetDir(Global::RIGHT);
+				else
+					return true;
 			}
 			break;
 		case Global::DOWN:
@@ -439,6 +449,8 @@ bool Board::IsPathClear(sf::Vector3f&s, int n)const
 					p.SetDir(Global::RIGHT);
 				else if (IsValidPath({ d.ri,d.ci - 1 }))
 					p.SetDir(Global::LEFT);
+				else
+					return true;
 			}
 			break;
 		case Global::LEFT:
@@ -457,6 +469,8 @@ bool Board::IsPathClear(sf::Vector3f&s, int n)const
 					p.SetDir(Global::UP);
 				else if (d.ri + 1 != dim.y && IsValidPath({ d.ri + 1,d.ci }))
 					p.SetDir(Global::DOWN);
+				else
+					return true;
 			}
 			break;
 		case Global::RIGHT:
@@ -475,19 +489,34 @@ bool Board::IsPathClear(sf::Vector3f&s, int n)const
 					p.SetDir(Global::UP);
 				else if (IsValidPath({ d.ri + 1,d.ci }))
 					p.SetDir(Global::DOWN);
+				else
+					return true;
 			}
 			break;
 		}
-		if (pcs[d.ri][d.ci].size() == 2 && !IsCheckpoint(d))
-			return false;
+		if (!jota)
+		{
+			if (pcs[d.ri][d.ci].size() >= 2 && !IsCheckpoint(d) && pcs[s.y][s.x][s.z].GetId() != pcs[d.ri][d.ci][0].GetId())
+				return false;
+		}
+		else
+		{
+			if (count!=n && pcs[d.ri][d.ci].size() >= 2 && !IsCheckpoint(d) && pcs[s.y][s.x][s.z].GetId() != pcs[d.ri][d.ci][0].GetId())
+				return false;
+		}
 	}
+	if (jota && !IsCheckpoint(d) && pcs[d.ri][d.ci].size() >= 3 && pcs[s.y][s.x][s.z].GetId() != pcs[d.ri][d.ci][0].GetId())
+		return false;
 	return true;
 }
 void Board::UpdateBoard(sf::RenderWindow& window, Player&p, const vector<int>&score, sf::Vector3f s, int n)
 {
+	bool jota = false;
 	int count = 0;
 	Position d;
 	d.ri = s.y, d.ci = s.x;
+	if (n % 2 == 0 && pcs[s.y][s.x].size() == 2 && !IsCheckpoint(d))
+		jota = true;
 	while (window.isOpen())
 	{
 		sf::Event evnt;
@@ -500,94 +529,199 @@ void Board::UpdateBoard(sf::RenderWindow& window, Player&p, const vector<int>&sc
 		{
 		case Global::UP:
 			d.ri--;
-			if (d.ri != -1 && IsValidPath(d))
+			if (d.ri != -1 && IsValidPath(d) || d.ri!=-1 && pcs[s.y][s.x][s.z].IsPieceWin(d))
 			{
-				pcs[s.y][s.x][s.z].Move(window, d);
-				count++;
-				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
-					pcs[s.y][s.x][s.z].SetDir(Global::RIGHT);
+				if (jota)
+				{
+					pcs[s.y][s.x][0].Move(window, d);
+					pcs[s.y][s.x][1].Move(window, d);
+					count += 2;
+					if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::RIGHT);
+						pcs[s.y][s.x][1].SetDir(Global::RIGHT);
+					}
+				}
+				else
+				{
+					pcs[s.y][s.x][s.z].Move(window, d);
+					count++;
+					if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+						pcs[s.y][s.x][s.z].SetDir(Global::RIGHT);
+				}
 			}
 			else
 			{
 				if (d.ri == -1 || shp[d.ri][d.ci]->GetId() != '#')
 					d.ri++;
-				if (d.ci - 1 != -1 && IsValidPath({ d.ri,d.ci - 1 }))
-					pcs[s.y][s.x][s.z].SetDir(Global::LEFT);
-				else if (IsValidPath({d.ri,d.ci+1}))
-					pcs[s.y][s.x][s.z].SetDir(Global::RIGHT);
+				if (jota)
+				{
+					if (d.ci - 1 != -1 && IsValidPath({ d.ri,d.ci - 1 }))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::LEFT);
+						pcs[s.y][s.x][1].SetDir(Global::LEFT);
+					}
+					else if (IsValidPath({ d.ri,d.ci + 1 }))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::RIGHT);
+						pcs[s.y][s.x][1].SetDir(Global::RIGHT);
+					}
+				}
+				else
+				{
+					if (d.ci - 1 != -1 && IsValidPath({ d.ri,d.ci - 1 }))
+						pcs[s.y][s.x][s.z].SetDir(Global::LEFT);
+					else if (IsValidPath({ d.ri,d.ci + 1 }))
+						pcs[s.y][s.x][s.z].SetDir(Global::RIGHT);
+				}
 			}
 			break;
 		case Global::DOWN:
 			d.ri++;
-			if (d.ri != dim.y && IsValidPath(d))
+			if (d.ri != dim.y && IsValidPath(d) || d.ri!=dim.y && pcs[s.y][s.x][s.z].IsPieceWin(d))
 			{
-				pcs[s.y][s.x][s.z].Move(window, d);
-				count++;
-				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
-					pcs[s.y][s.x][s.z].SetDir(Global::LEFT);
+				if (jota)
+				{
+					pcs[s.y][s.x][0].Move(window, d);
+					pcs[s.y][s.x][1].Move(window, d);
+					count+=2;
+					if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::LEFT);
+						pcs[s.y][s.x][1].SetDir(Global::LEFT);
+					}
+				}
+				else
+				{
+					pcs[s.y][s.x][s.z].Move(window, d);
+					count++;
+					if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+						pcs[s.y][s.x][s.z].SetDir(Global::LEFT);
+				}
 			}
 			else
 			{
 				if (d.ri == dim.y || shp[d.ri][d.ci]->GetId() != '#')
 					d.ri--;
-				if (d.ci + 1 != dim.x && IsValidPath({d.ri,d.ci+1}))
-					pcs[s.y][s.x][s.z].SetDir(Global::RIGHT);
-				else if (IsValidPath({d.ri,d.ci-1}))
-					pcs[s.y][s.x][s.z].SetDir(Global::LEFT);
+				if (jota)
+				{
+					if (d.ci + 1 != dim.x && IsValidPath({ d.ri,d.ci + 1 }))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::RIGHT);
+						pcs[s.y][s.x][1].SetDir(Global::RIGHT);
+					}
+					else if (IsValidPath({ d.ri,d.ci - 1 }))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::LEFT);
+						pcs[s.y][s.x][1].SetDir(Global::LEFT);
+					}
+				}
+				else
+				{
+					if (d.ci + 1 != dim.x && IsValidPath({ d.ri,d.ci + 1 }))
+						pcs[s.y][s.x][s.z].SetDir(Global::RIGHT);
+					else if (IsValidPath({ d.ri,d.ci - 1 }))
+						pcs[s.y][s.x][s.z].SetDir(Global::LEFT);
+				}
 			}
 			break;
 		case Global::LEFT:
 			d.ci--;
-			if (d.ci != -1 && IsValidPath(d))
+			if (d.ci != -1 && IsValidPath(d) || d.ci!=-1 && pcs[s.y][s.x][s.z].IsPieceWin(d))
 			{
-				pcs[s.y][s.x][s.z].Move(window, d);
-				count++;
-				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
-					pcs[s.y][s.x][s.z].SetDir(Global::UP);
+				if (jota)
+				{
+					pcs[s.y][s.x][0].Move(window, d);
+					pcs[s.y][s.x][1].Move(window, d);
+					count+=2;
+					if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::UP);
+						pcs[s.y][s.x][1].SetDir(Global::UP);
+					}
+				}
+				else
+				{
+					pcs[s.y][s.x][s.z].Move(window, d);
+					count++;
+					if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+						pcs[s.y][s.x][s.z].SetDir(Global::UP);
+				}
 			}
 			else
 			{
 				if (d.ci == -1 || shp[d.ri][d.ci]->GetId() != '#')
 					d.ci++;
-				if (IsValidPath({d.ri-1,d.ci}))
-					pcs[s.y][s.x][s.z].SetDir(Global::UP);
-				else if (d.ri + 1 != dim.y && IsValidPath({d.ri+1,d.ci}))
-					pcs[s.y][s.x][s.z].SetDir(Global::DOWN);
+				if (jota)
+				{
+					if (IsValidPath({ d.ri - 1,d.ci }))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::UP);
+						pcs[s.y][s.x][1].SetDir(Global::UP);
+					}
+					else if (d.ri + 1 != dim.y && IsValidPath({ d.ri + 1,d.ci }))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::DOWN);
+						pcs[s.y][s.x][1].SetDir(Global::DOWN);
+					}
+				}
+				else
+				{
+					if (IsValidPath({ d.ri - 1,d.ci }))
+						pcs[s.y][s.x][s.z].SetDir(Global::UP);
+					else if (d.ri + 1 != dim.y && IsValidPath({ d.ri + 1,d.ci }))
+						pcs[s.y][s.x][s.z].SetDir(Global::DOWN);
+				}
 			}
 			break;
 		case Global::RIGHT:
 			d.ci++;
-			if (d.ci != dim.x && IsValidPath(d))
+			if (d.ci != dim.x && IsValidPath(d) || d.ci != dim.x && pcs[s.y][s.x][s.z].IsPieceWin(d))
 			{
-				pcs[s.y][s.x][s.z].Move(window, d);
-				count++;
-				if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
-					pcs[s.y][s.x][s.z].SetDir(Global::DOWN);
+				if (jota)
+				{
+					pcs[s.y][s.x][0].Move(window, d);
+					pcs[s.y][s.x][1].Move(window, d);
+					count+=2;
+					if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::DOWN);
+						pcs[s.y][s.x][1].SetDir(Global::DOWN);
+					}
+				}
+				else
+				{
+					pcs[s.y][s.x][s.z].Move(window, d);
+					count++;
+					if (pcs[s.y][s.x][s.z].IsRoundCompleted(d))
+						pcs[s.y][s.x][s.z].SetDir(Global::DOWN);
+				}
 			}
 			else
 			{
 				if (d.ci == dim.x || shp[d.ri][d.ci]->GetId() != '#')
 					d.ci--;
-				if (d.ri - 1 != -1 && IsValidPath({ d.ri - 1,d.ci }))
-					pcs[s.y][s.x][s.z].SetDir(Global::UP);
-				else if (IsValidPath({ d.ri + 1,d.ci }))
-					pcs[s.y][s.x][s.z].SetDir(Global::DOWN);
+				if (jota)
+				{
+					if (d.ri - 1 != -1 && IsValidPath({ d.ri - 1,d.ci }))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::UP);
+						pcs[s.y][s.x][1].SetDir(Global::UP);
+					}
+					else if (IsValidPath({ d.ri + 1,d.ci }))
+					{
+						pcs[s.y][s.x][0].SetDir(Global::DOWN);
+						pcs[s.y][s.x][1].SetDir(Global::DOWN);
+					}
+				}
+				else
+				{
+					if (d.ri - 1 != -1 && IsValidPath({ d.ri - 1,d.ci }))
+						pcs[s.y][s.x][s.z].SetDir(Global::UP);
+					else if (IsValidPath({ d.ri + 1,d.ci }))
+						pcs[s.y][s.x][s.z].SetDir(Global::DOWN);
+				}
 			}
-			break;
-		}
-		if (count == n)
-		{
-			if (!IsCheckpoint(d) && !IsEmptySpace(d) && pcs[d.ri][d.ci][0].GetId() != pcs[s.y][s.x][s.z].GetId())
-			{
-				pcs[d.ri][d.ci][0].Move(window, pcs[d.ri][d.ci][0].GetHome());
-				pcs[d.ri][d.ci][0].SetIsFirst(true);
-				pcs[pcs[d.ri][d.ci][0].GetHome().ri][pcs[d.ri][d.ci][0].GetHome().ci].push_back(pcs[d.ri][d.ci][0]);
-				pcs[d.ri][d.ci].erase(pcs[d.ri][d.ci].begin() + 0);
-				p.SetHasRolled(false);
-			}
-			this->pcs[d.ri][d.ci].push_back(this->pcs[s.y][s.x][s.z]);
-			this->pcs[s.y][s.x].erase(this->pcs[s.y][s.x].begin() + s.z);
-			SetPieces();
 			break;
 		}
 		window.clear();
@@ -597,6 +731,53 @@ void Board::UpdateBoard(sf::RenderWindow& window, Player&p, const vector<int>&sc
 		p.GetDice().DisplayNumbers(window, score);
 		window.display();
 		sf::sleep(sf::seconds(0.1));
+		if (count == n)
+		{
+			if (!IsCheckpoint(d) && !IsEmptySpace(d) && pcs[d.ri][d.ci][0].GetId() != pcs[s.y][s.x][s.z].GetId())
+			{
+				if (jota)
+				{
+					pcs[d.ri][d.ci][0].Move(window, pcs[d.ri][d.ci][0].GetHome());
+					pcs[d.ri][d.ci][1].Move(window, pcs[d.ri][d.ci][1].GetHome());
+					pcs[d.ri][d.ci][0].SetIsFirst(true);
+					pcs[d.ri][d.ci][1].SetIsFirst(true);
+					pcs[pcs[d.ri][d.ci][0].GetHome().ri][pcs[d.ri][d.ci][0].GetHome().ci].push_back(pcs[d.ri][d.ci][0]);
+					pcs[pcs[d.ri][d.ci][1].GetHome().ri][pcs[d.ri][d.ci][1].GetHome().ci].push_back(pcs[d.ri][d.ci][1]);
+					pcs[d.ri][d.ci].erase(pcs[d.ri][d.ci].begin() + 0);
+					pcs[d.ri][d.ci].erase(pcs[d.ri][d.ci].begin() + 0);
+					p.SetHasRolled(false);
+				}
+				else
+				{
+					pcs[d.ri][d.ci][0].Move(window, pcs[d.ri][d.ci][0].GetHome());
+					pcs[d.ri][d.ci][0].SetIsFirst(true);
+					pcs[pcs[d.ri][d.ci][0].GetHome().ri][pcs[d.ri][d.ci][0].GetHome().ci].push_back(pcs[d.ri][d.ci][0]);
+					pcs[d.ri][d.ci].erase(pcs[d.ri][d.ci].begin() + 0);
+					p.SetHasRolled(false);
+				}
+			}
+			if (jota)
+			{
+				this->pcs[d.ri][d.ci].push_back(this->pcs[s.y][s.x][0]);
+				this->pcs[d.ri][d.ci].push_back(this->pcs[s.y][s.x][1]);
+				this->pcs[s.y][s.x].erase(this->pcs[s.y][s.x].begin() + 0);
+				this->pcs[s.y][s.x].erase(this->pcs[s.y][s.x].begin() + 0);
+				if (pcs[d.ri][d.ci][pcs[d.ri][d.ci].size() - 1].IsPieceWin(d))
+				{
+					pcs[d.ri][d.ci].erase(pcs[d.ri][d.ci].begin() + 0);
+					pcs[d.ri][d.ci].erase(pcs[d.ri][d.ci].begin() + 0);
+				}
+			}
+			else
+			{
+				this->pcs[d.ri][d.ci].push_back(this->pcs[s.y][s.x][s.z]);
+				this->pcs[s.y][s.x].erase(this->pcs[s.y][s.x].begin() + s.z);
+				if (pcs[d.ri][d.ci][pcs[d.ri][d.ci].size() - 1].IsPieceWin(d))
+					pcs[d.ri][d.ci].erase(pcs[d.ri][d.ci].begin() + (pcs[d.ri][d.ci].size() - 1));
+			}
+			SetPieces();
+			break;
+		}
 	}
 }
 bool Board::IsEmptySpace(Position p)const
@@ -631,4 +812,27 @@ Shape* Board::GetShapeAt(Position p)const
 const sf::Vector2f& Board::GetDim()const
 {
 	return this->dim;
+}
+void Board::DeleteBoard()
+{
+	for (int i = 0;i < dim.y;i++)
+	{
+		for (int j = 0;j < dim.x;j++)
+		{
+			pcs[i][j].clear();
+		}
+		pcs[i].clear();
+	}
+	for (int i = 0;i < dim.y;i++)
+	{
+		for (int j = 0;j < dim.x;j++)
+		{
+			delete shp[i][j];
+		}
+		delete[]shp[i];
+	}
+}
+Board::~Board()
+{
+	DeleteBoard();
 }

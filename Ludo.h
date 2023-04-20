@@ -8,26 +8,34 @@ class Player;
 class Ludo
 {
 private:
+	sf::Sprite pause;
 	bool IsSocSel;
 	bool IsDesSel;
 	bool IsNumSel;
-	vector<int>score;
+	int nop;
+	vector<int>score; 
 	sf::Vector3f rs;
 	Position s;
 	Position d;
-	int nop;
 	Board* b;
 	Player** ps;
 	int turn;
+	void SocHighlight();
+	void SocUnhighlight();
+	void ShowSocMsg(sf::RenderWindow& window)const;
+	void ShowNumMsg(sf::RenderWindow& window)const;
+	void init(sf::RenderWindow& window);
+	void WinningScreen(sf::RenderWindow& window)const;
+	bool IsWin()const;
 	bool InBound()const;
 	bool IsValidNum()const;
 	bool IsValidSource()const;
 	bool IsValidDestin()const;
 	void MainMenu(sf::RenderWindow& window);
+	void Pause(sf::RenderWindow& window);
 	void SelectPosition(sf::RenderWindow& window);
 	bool CanMove()const;
 	void FindSocAuto();
-	void FindDestAuto(int n);
 	bool CanMoveAuto()const;
 	void MoveAuto(sf::RenderWindow&window);
 	void TurnCh();

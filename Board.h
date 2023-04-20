@@ -24,7 +24,8 @@ private:
 	void SetPieces();
 public:
 	Board(sf::RenderWindow& window, int nop);
-	int GetPieceCount(char id)const;
+	bool IsOnBoard(Position p)const;
+	int GetPieceCountOnBoard(char id)const;
 	int GetPieceCountAtHome(char id)const;
 	void DrawBoard(sf::RenderWindow& window)const;
 	void DrawPieces(sf::RenderWindow& window)const;
@@ -38,5 +39,7 @@ public:
 	Piece GetPieceAt(sf::Vector3f p)const;
 	Shape* GetShapeAt(Position p)const;
 	const sf::Vector2f& GetDim()const;
+	void DeleteBoard();
+	~Board();
 };
 

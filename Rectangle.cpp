@@ -9,7 +9,9 @@ Rectangle::Rectangle(sf::Color fillClr, sf::Color outClr, Position p, char id)
 	rec.setFillColor(GetFillClr());
 	rec.setOutlineColor(GetOutClr());
 }
-void Rectangle::DrawShape(sf::RenderWindow& window)const
+void Rectangle::DrawShape(sf::RenderWindow& window)
 {
+	rec.setFillColor(fillClr);
+	rec.setOutlineColor(outClr);
 	window.draw(rec);
 }
