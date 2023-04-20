@@ -10,6 +10,8 @@ public:
 	static sf::Texture* dts;
 	static sf::Font f;
 	static sf::Font f1;
+	static sf::Font f2;
+	static sf::Font f3;
 	void static getRowColbyLeftClick(int& rpos, int& cpos, sf::RenderWindow&window);
 };
 
