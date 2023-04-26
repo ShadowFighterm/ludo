@@ -119,16 +119,16 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 	twop.setTexture(Global::ts[10]);
 	twop.setScale(0.2, 0.2);
 	twop.setPosition((float)window.getSize().x / 2 - 40, (float)window.getSize().y / 3);
-	p2.setFont(Global::f3);
+	p2.setFont(Global::f);
 	p2.setString("2 Player");
 	p2.setCharacterSize(30);
 	p2.setPosition((float)window.getSize().x / 2 - 70, (float)window.getSize().y / 3 + 50);
 	p4.setCharacterSize(30);
-	p4.setFont(Global::f3);
+	p4.setFont(Global::f);
 	p4.setString("4 Player");
 	p4.setPosition((float)window.getSize().x / 2 - 70, (float)window.getSize().y / 3 + 120);
 	p6.setCharacterSize(30);
-	p6.setFont(Global::f3);
+	p6.setFont(Global::f);
 	p6.setString("6 Player");
 	p6.setPosition((float)window.getSize().x / 2 - 70, (float)window.getSize().y / 3 + 190);
 	while (window.isOpen())
@@ -142,7 +142,7 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 		if (p2.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
 		{
 			p2.setCharacterSize(40);
-			p2.setFillColor(sf::Color::Color(173, 234, 24));
+			p2.setFillColor(sf::Color::Green);
 		}
 		else
 		{
@@ -152,7 +152,7 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 		if (p4.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
 		{
 			p4.setCharacterSize(40);
-			p4.setFillColor(sf::Color::Color(173, 234, 24));
+			p4.setFillColor(sf::Color::Green);
 		}
 		else
 		{
@@ -163,7 +163,7 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 		if (p6.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
 		{
 			p6.setCharacterSize(40);
-			p6.setFillColor(sf::Color::Color(173, 234, 24));
+			p6.setFillColor(sf::Color::Green);
 		}
 		else
 		{
@@ -296,19 +296,17 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 	sf::Color clr;
 	name.setCharacterSize(30);
 	name.setPosition((float)window.getSize().x / 5, (float)window.getSize().y / 2 + 10);
-	name.setFillColor(sf::Color::Yellow);
-	name.setOutlineColor(sf::Color::Black);
-	name.setStyle(sf::Text::Bold);
-	name.setFont(Global::f3);
+	name.setFillColor(sf::Color::Black);
+	name.setFont(Global::f);
 	box.setPosition((float)window.getSize().x / 3, (float)window.getSize().y / 2);
 	box.setFillColor(sf::Color::Transparent);
 	box.setOutlineThickness(-(float)5);
 	box.setSize(sf::Vector2f((float)window.getSize().x / 4, 60));
 	box.setOutlineColor(sf::Color::Green);
-	input.setFont(Global::f1);
+	input.setFont(Global::f);
 	input.setCharacterSize(30);
 	input.setPosition((float)window.getSize().x / 3 + 10, (float)window.getSize().y / 2 + 10);
-	input.setFillColor(sf::Color::Cyan);
+	input.setFillColor(sf::Color::Magenta);
 	while (window.isOpen())
 	{
 		sf::Event evnt;
@@ -318,7 +316,7 @@ void Ludo::MainMenu(sf::RenderWindow& window)
 				window.close();
 			else if (evnt.type == sf::Event::TextEntered)
 			{
-				if (evnt.text.unicode >= 'a' && evnt.text.unicode <= 'z'|| evnt.text.unicode >= 'A' && evnt.text.unicode <= 'Z')
+				if (evnt.text.unicode >= 'a' && evnt.text.unicode <= 'z')
 					sinput += static_cast<char>(evnt.text.unicode);
 				else if (evnt.text.unicode == '\b' && !sinput.empty())
 					sinput.pop_back();
@@ -467,9 +465,6 @@ Ludo::Ludo(sf::RenderWindow& window)
 	Global::ts = new sf::Texture[14];
 	Global::f.loadFromFile("arial.ttf");
 	Global::f1.loadFromFile("vinque.otf");
-	Global::f2.loadFromFile("Plante.ttf");
-	Global::f3.loadFromFile("High Fighter.ttf");
-	
 	Global::ts[0].loadFromFile("red_piece.png");
 	Global::ts[1].loadFromFile("green_piece.png");
 	Global::ts[2].loadFromFile("blue_piece.png");
@@ -479,7 +474,7 @@ Ludo::Ludo(sf::RenderWindow& window)
 	Global::ts[6].loadFromFile("star.png");
 	Global::ts[7].loadFromFile("background.jpg");
 	Global::ts[8].loadFromFile("logo.png");
-	Global::ts[9].loadFromFile("Background1.jpg");
+	Global::ts[9].loadFromFile("menu_bg.jpg");
 	Global::ts[10].loadFromFile("win_1.png");
 	Global::ts[11].loadFromFile("win_2.png");
 	Global::ts[12].loadFromFile("pause.png");
@@ -556,7 +551,6 @@ bool Ludo::IsValidNum()const
 	int i = s.ci - 24;
 	return s.ri == 3 && i != score.size() && i >= 0;
 }
-
 bool Ludo::CanMove()const
 {
 	sf::Vector3f v;

@@ -5,8 +5,6 @@ sf::Texture* Global::dts = nullptr;
 char* Global::turnId = nullptr;
 sf::Font Global::f;
 sf::Font Global::f1;
-sf::Font Global::f2;
-sf::Font Global::f3;
 void Global::getRowColbyLeftClick(int& rpos, int& cpos, sf::RenderWindow& window)
 {
 	sf::Vector2f p = sf::Vector2f(sf::Mouse::getPosition(window));
