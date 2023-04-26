@@ -374,7 +374,7 @@ void Ludo::ShowSocMsg(sf::RenderWindow& window)const
 	smsg.setFillColor(sf::Color::Blue);
 	smsg.setCharacterSize(30);
 	smsg.setPosition((float)(b)->GetDim().x * Global::SqrDim.x + 5,(float) 7 * Global::SqrDim.y);
-	smsg.setString("Piece Selected\n Now Select \nThe Number");
+	smsg.setString("Now Select \nThe Number");
 	window.draw(smsg);
 }
 void Ludo::ShowNumMsg(sf::RenderWindow& window)const
@@ -384,7 +384,17 @@ void Ludo::ShowNumMsg(sf::RenderWindow& window)const
 	nmsg.setFillColor(sf::Color::Blue);
 	nmsg.setCharacterSize(30);
 	nmsg.setPosition((float)b->GetDim().x * Global::SqrDim.x + 5,(float) 7 * Global::SqrDim.y);
-	nmsg.setString("Number Selected\n Now Select \n Destination \n From Board");
+	nmsg.setString("Now Select \n Destination \n From Board");
+	window.draw(nmsg);
+}
+void Ludo::ShowFirstMsg(sf::RenderWindow& window)const
+{
+	sf::Text nmsg;
+	nmsg.setFont(Global::f1);
+	nmsg.setFillColor(sf::Color::Blue);
+	nmsg.setCharacterSize(30);
+	nmsg.setPosition((float)b->GetDim().x * Global::SqrDim.x + 5, (float)7 * Global::SqrDim.y);
+	nmsg.setString("Select Piece");
 	window.draw(nmsg);
 }
 void Ludo::SocHighlight()
@@ -506,6 +516,8 @@ void Ludo::Play(sf::RenderWindow& window)
 		ps[turn]->GetDice().DrawMainDice(window);
 		ps[turn]->GetDice().DisplayNumbers(window, score);
 		ps[turn]->DisplayName(window);
+		if (!IsSocSel && ps[turn]->GetHasRolled())
+			ShowFirstMsg(window);
 		if (IsSocSel && !IsNumSel)
 		{
 			ShowSocMsg(window);

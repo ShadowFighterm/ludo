@@ -24,6 +24,7 @@ private:
 	void SocUnhighlight();
 	void ShowSocMsg(sf::RenderWindow& window)const;
 	void ShowNumMsg(sf::RenderWindow& window)const;
+	void ShowFirstMsg(sf::RenderWindow& window)const;
 	void init(sf::RenderWindow& window);
 	void WinningScreen(sf::RenderWindow& window)const;
 	bool IsWin()const;
