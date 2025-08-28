@@ -21,5 +21,6 @@ This project demonstrates **game development basics** such as rendering, event h
 
 ## 📦 Installation & Setup
 
-1. Clone the repository:
+1. Clone the repository
+2. Run main.cpp
 
