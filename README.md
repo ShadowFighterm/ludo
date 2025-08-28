@@ -20,7 +20,7 @@ This project demonstrates **game development basics** such as rendering, event h
 ---
 
 ## 📦 Installation & Setup
-
-1. Clone the repository
-2. Run main.cpp
+1. Install SFML
+2. Clone Repository
+3. Run main.cpp
 
